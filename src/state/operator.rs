@@ -9,12 +9,14 @@ pub enum OpCode {
 #[derive(Copy, Clone)]
 pub struct Operator {
     pub mnemonic: OpCode,
-    pub run: fn(State) -> State,
+    pub requires_arg: bool,
+    pub run: fn(State, u8) -> State,
 }
 
 pub const NOP: Operator = Operator {
     mnemonic: OpCode::NOP,
-    run: |state| {
+    requires_arg: false,
+    run: |state, _| {
         State {
             pc: state.pc + 1,
             ..state
@@ -24,7 +26,8 @@ pub const NOP: Operator = Operator {
 
 pub const HLT: Operator = Operator {
     mnemonic: OpCode::HLT,
-    run: |state| {
+    requires_arg: false,
+    run: |state, _| {
         State {
             pc: state.pc + 1,
             halt: true,

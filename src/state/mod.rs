@@ -30,7 +30,14 @@ impl State {
     pub fn start(self) {
         let operator = self.fetch_operator();
 
-        let new_state = self.execute_operator(operator);
+        let operator_argument: u8;
+        if operator.requires_arg {
+            operator_argument = self.memory[self.pc + 1];
+        } else {
+            operator_argument = 0;
+        }
+
+        let new_state = self.execute_operator(operator, operator_argument);
         new_state.show();
 
         if new_state.halt == true {
@@ -49,9 +56,9 @@ impl State {
         }
     }
 
-    fn execute_operator(self, operator: Operator) -> State {
+    fn execute_operator(self, operator: Operator, operator_argument: u8) -> State {
         println!("{:?}", operator.mnemonic);
-        (operator.run)(self)
+        (operator.run)(self, operator_argument)
     }
 }
 
