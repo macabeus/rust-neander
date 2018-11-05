@@ -2,7 +2,7 @@ mod state;
 use state::State;
 
 fn main() {
-    let state = State::new(&[0x00, 0x00]);
+    let state = State::new(&[0x00, 0x00, 0xFF]);
     state.start();
 }
 

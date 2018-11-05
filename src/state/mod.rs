@@ -5,6 +5,7 @@ use state::operator::get_operator;
 pub struct State {
     memory: [u8; 255],
     pc: usize,
+    halt: bool,
 }
 
 impl State {
@@ -17,6 +18,7 @@ impl State {
         State {
             memory: new_memory,
             pc: 0,
+            halt: false,
         }
     }
 
@@ -31,7 +33,9 @@ impl State {
         let new_state = self.execute_operator(operator);
         new_state.show();
 
-        if new_state.pc >= 255 {
+        if new_state.halt == true {
+            println!("Finish: halt")
+        } else if new_state.pc >= 255 {
             println!("Finish: end of memory")
         } else {
             new_state.start();
