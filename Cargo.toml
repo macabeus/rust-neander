@@ -1,0 +1,6 @@
+[package]
+name = "rust_neander"
+version = "0.1.0"
+authors = ["macabeus"]
+
+[dependencies]

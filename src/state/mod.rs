@@ -1,0 +1,48 @@
+mod operator;
+use state::operator::Operator;
+use state::operator::get_operator;
+
+pub struct State {
+    memory: [u8; 255],
+    pc: usize,
+}
+
+impl State {
+    pub fn new() -> State {
+        State {
+            memory: [0x00; 255],
+            pc: 0,
+        }
+    }
+
+    fn show(&self) {
+        println!("PC: {}", self.pc);
+        println!("--------");
+    }
+
+    pub fn start(self) {
+        let operator = self.fetch_operator();
+
+        let new_state = self.execute_operator(operator);
+        new_state.show();
+
+        if new_state.pc >= 255 {
+            println!("Finish: end of memory")
+        } else {
+            new_state.start();
+        }
+    }
+
+    fn fetch_operator(&self) -> Operator {
+        match get_operator(&self.memory[self.pc]) {
+            Some(operator) => operator,
+            None => panic!("Unknow OpCode: {:#04X}", self.memory[self.pc]),
+        }
+    }
+
+    fn execute_operator(self, operator: Operator) -> State {
+        println!("{:?}", operator.mnemonic);
+        (operator.run)(self)
+    }
+}
+
