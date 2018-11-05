@@ -5,6 +5,7 @@ use state::operator::get_operator;
 pub struct State {
     memory: [u8; 255],
     pc: usize,
+    ac: u8,
     halt: bool,
 }
 
@@ -18,12 +19,14 @@ impl State {
         State {
             memory: new_memory,
             pc: 0,
+            ac: 0,
             halt: false,
         }
     }
 
     fn show(&self) {
         println!("PC: {}", self.pc);
+        println!("AC: {}", self.ac);
         println!("--------");
     }
 
