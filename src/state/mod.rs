@@ -8,9 +8,14 @@ pub struct State {
 }
 
 impl State {
-    pub fn new() -> State {
+    pub fn new(memory: &[u8]) -> State {
+        let mut new_memory = [0x00; 255];
+        for (i, item) in memory.iter().enumerate() {
+            new_memory[i] = *item;
+        }
+
         State {
-            memory: [0x00; 255],
+            memory: new_memory,
             pc: 0,
         }
     }
