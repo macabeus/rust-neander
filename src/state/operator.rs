@@ -3,6 +3,7 @@ use state::State;
 #[derive(Copy, Clone, Debug)]
 pub enum OpCode {
     NOP,
+    STA,
     LDA,
     HLT,
 }
@@ -23,6 +24,21 @@ pub const NOP: Operator = Operator {
             ..state
         }
     },
+};
+
+pub const STA: Operator = Operator {
+    mnemonic: OpCode::STA,
+    requires_arg: true,
+    run: |state, argument| {
+        let mut memory = state.memory;
+        memory[argument as usize] = state.ac;
+
+        State {
+            pc: state.pc + 2,
+            memory,
+            ..state
+        }
+    }
 };
 
 pub const LDA: Operator = Operator {
@@ -52,6 +68,7 @@ pub const HLT: Operator = Operator {
 pub fn get_operator(code: &u8) -> Option<Operator> {
     match code {
         0x00 ... 0x0F => Some(NOP),
+        0x10 ... 0x1F => Some(STA),
         0x20 ... 0x2F => Some(LDA),
         0xF0 ... 0xFF => Some(HLT),
         _ => None,
