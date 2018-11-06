@@ -30,7 +30,7 @@ impl State {
         println!("--------");
     }
 
-    pub fn start(self) {
+    pub fn start(self) -> State {
         let operator = self.fetch_operator();
 
         let operator_argument: u8;
@@ -44,11 +44,13 @@ impl State {
         new_state.show();
 
         if new_state.halt == true {
-            println!("Finish: halt")
+            println!("Finish: halt");
+            new_state
         } else if new_state.pc >= 255 {
-            println!("Finish: end of memory")
+            println!("Finish: end of memory");
+            new_state
         } else {
-            new_state.start();
+            new_state.start()
         }
     }
 
@@ -62,6 +64,15 @@ impl State {
     fn execute_operator(self, operator: Operator, operator_argument: u8) -> State {
         println!("{:?}", operator.mnemonic);
         (operator.run)(self, operator_argument)
+    }
+
+    pub fn print_memory(self, limit: usize) {
+        for i in self.memory[..limit].iter() {
+            match get_operator(i) {
+                Some(operator) => println!("[{:?}] {:#04X}", operator.mnemonic, i),
+                None => println!("[   ] {:#04X}", i),
+            }
+        }
     }
 }
 
