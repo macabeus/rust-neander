@@ -5,6 +5,7 @@ pub enum OpCode {
     NOP,
     STA,
     LDA,
+    ADD,
     HLT,
 }
 
@@ -53,6 +54,20 @@ pub const LDA: Operator = Operator {
     }
 };
 
+pub const ADD: Operator = Operator {
+    mnemonic: OpCode::ADD,
+    requires_arg: true,
+    run: |state, argument| {
+        let memory_value = state.memory[argument as usize];
+
+        State {
+            pc: state.pc + 2,
+            ac: state.ac + memory_value,
+            ..state
+        }
+    }
+};
+
 pub const HLT: Operator = Operator {
     mnemonic: OpCode::HLT,
     requires_arg: false,
@@ -70,6 +85,7 @@ pub fn get_operator(code: &u8) -> Option<Operator> {
         0x00 ... 0x0F => Some(NOP),
         0x10 ... 0x1F => Some(STA),
         0x20 ... 0x2F => Some(LDA),
+        0x30 ... 0x3F => Some(ADD),
         0xF0 ... 0xFF => Some(HLT),
         _ => None,
     }
