@@ -8,6 +8,7 @@ pub enum OpCode {
     ADD,
     OR,
     AND,
+    NOT,
     HLT,
 }
 
@@ -98,6 +99,18 @@ pub const AND: Operator = Operator {
     }
 };
 
+pub const NOT: Operator = Operator {
+    mnemonic: OpCode::NOT,
+    requires_arg: false,
+    run: |state, _| {
+        State {
+            pc: state.pc + 1,
+            ac: !state.ac,
+            ..state
+        }
+    }
+};
+
 pub const HLT: Operator = Operator {
     mnemonic: OpCode::HLT,
     requires_arg: false,
@@ -118,6 +131,7 @@ pub fn get_operator(code: &u8) -> Option<Operator> {
         0x30 ... 0x3F => Some(ADD),
         0x40 ... 0x4F => Some(OR),
         0x50 ... 0x5F => Some(AND),
+        0x60 ... 0x6F => Some(NOT),
         0xF0 ... 0xFF => Some(HLT),
         _ => None,
     }
