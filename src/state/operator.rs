@@ -10,6 +10,7 @@ pub enum OpCode {
     AND,
     NOT,
     SUB,
+    JMP,
     HLT,
 }
 
@@ -126,6 +127,17 @@ pub const SUB: Operator = Operator {
     }
 };
 
+pub const JMP: Operator = Operator {
+    mnemonic: OpCode::JMP,
+    requires_arg: true,
+    run: |state, argument| {
+        State {
+            pc: argument as usize,
+            ..state
+        }
+    }
+};
+
 pub const HLT: Operator = Operator {
     mnemonic: OpCode::HLT,
     requires_arg: false,
@@ -148,6 +160,7 @@ pub fn get_operator(code: &u8) -> Option<Operator> {
         0x50 ... 0x5F => Some(AND),
         0x60 ... 0x6F => Some(NOT),
         0x70 ... 0x7F => Some(SUB),
+        0x80 ... 0x8F => Some(JMP),
         0xF0 ... 0xFF => Some(HLT),
         _ => None,
     }
