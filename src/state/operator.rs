@@ -9,6 +9,7 @@ pub enum OpCode {
     OR,
     AND,
     NOT,
+    SUB,
     HLT,
 }
 
@@ -111,6 +112,20 @@ pub const NOT: Operator = Operator {
     }
 };
 
+pub const SUB: Operator = Operator {
+    mnemonic: OpCode::SUB,
+    requires_arg: true,
+    run: |state, argument| {
+        let memory_value = state.memory[argument as usize];
+
+        State {
+            pc: state.pc + 2,
+            ac: state.ac - memory_value,
+            ..state
+        }
+    }
+};
+
 pub const HLT: Operator = Operator {
     mnemonic: OpCode::HLT,
     requires_arg: false,
@@ -132,6 +147,7 @@ pub fn get_operator(code: &u8) -> Option<Operator> {
         0x40 ... 0x4F => Some(OR),
         0x50 ... 0x5F => Some(AND),
         0x60 ... 0x6F => Some(NOT),
+        0x70 ... 0x7F => Some(SUB),
         0xF0 ... 0xFF => Some(HLT),
         _ => None,
     }
