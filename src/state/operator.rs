@@ -11,6 +11,7 @@ pub enum OpCode {
     NOT,
     SUB,
     JMP,
+    JN,
     HLT,
 }
 
@@ -138,6 +139,23 @@ pub const JMP: Operator = Operator {
     }
 };
 
+pub const JN: Operator = Operator {
+    mnemonic: OpCode::JN,
+    requires_arg: true,
+    run: |state, argument| {
+        let next_pc = if state.ac >= 0b1000000 {
+            argument as usize
+        } else {
+            state.pc + 2
+        };
+
+        State {
+            pc: next_pc,
+            ..state
+        }
+    }
+};
+
 pub const HLT: Operator = Operator {
     mnemonic: OpCode::HLT,
     requires_arg: false,
@@ -161,6 +179,7 @@ pub fn get_operator(code: &u8) -> Option<Operator> {
         0x60 ... 0x6F => Some(NOT),
         0x70 ... 0x7F => Some(SUB),
         0x80 ... 0x8F => Some(JMP),
+        0x90 ... 0x9F => Some(JN),
         0xF0 ... 0xFF => Some(HLT),
         _ => None,
     }
