@@ -15,6 +15,7 @@ pub enum OpCode {
     JZ,
     JNZ,
     IN,
+    OUT,
     HLT,
 }
 
@@ -205,6 +206,19 @@ pub const IN: Operator = Operator {
     }
 };
 
+pub const OUT: Operator = Operator {
+    mnemonic: OpCode::OUT,
+    requires_arg: false,
+    run: |state, _| {
+        print!("{}", state.ac);
+
+        State {
+            pc: state.pc + 1,
+            ..state
+        }
+    }
+};
+
 pub const HLT: Operator = Operator {
     mnemonic: OpCode::HLT,
     requires_arg: false,
@@ -232,6 +246,7 @@ pub fn get_operator(code: &u8) -> Option<Operator> {
         0xA0 ... 0xAF => Some(JZ),
         0xB0 ... 0xBF => Some(JNZ),
         0xC0 ... 0xCF => Some(IN),
+        0xD0 ... 0xDF => Some(OUT),
         0xF0 ... 0xFF => Some(HLT),
         _ => None,
     }
