@@ -27,6 +27,12 @@ fn main() {
         0x00,
         0xA0,
         0x00,
+        0xB0,
+        0x1C,
+        0xFF,
+        0x00,
+        0x00,
+        0x00,
         0xFF,
     ]);
     let final_state = state.start();
