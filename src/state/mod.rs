@@ -6,6 +6,7 @@ pub struct State {
     memory: [u8; 255],
     pc: usize,
     ac: u8,
+    inputs: [u8; 255],
     halt: bool,
 }
 
@@ -20,6 +21,7 @@ impl State {
             memory: new_memory,
             pc: 0,
             ac: 0,
+            inputs: [0x00; 255],
             halt: false,
         }
     }
