@@ -1,0 +1,14 @@
+name: rust-neander
+version: "0.1"
+author: Macabeus
+about: Educational purpose virtual machine to assembly Neander and Neander+
+args:
+    - FILEPATH:
+        help: Sets the input file to use
+        required: true
+        index: 1
+    - input:
+        short: i
+        help: Sets the level of verbosity
+        takes_value: true
+

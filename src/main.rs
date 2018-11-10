@@ -1,43 +1,31 @@
+#[macro_use]
+extern crate clap;
 mod state;
+mod io;
 use state::State;
+use clap::App;
+
+struct CLICommands {
+    filename: String,
+    input: String,
+}
+
+fn extract_cli_commands() -> CLICommands {
+    let yaml = load_yaml!("cli.yml");
+    let matches = App::from_yaml(yaml).get_matches();
+
+    CLICommands {
+        filename: matches.value_of("FILEPATH").unwrap().to_string(),
+        input: matches.value_of("input").unwrap_or("").to_string(),
+    }
+}
 
 fn main() {
-    let state = State::new(&[
-        0x00,
-        0x20,
-        0x0A,
-        0x10,
-        0x11,
-        0x30,
-        0x11,
-        0x40,
-        0x00,
-        0x50,
-        0x11,
-        0x60,
-        0x70,
-        0x11,
-        0x80,
-        0x12,
-        0xFF,
-        0x00,
-        0x90,
-        0x15,
-        0xFF,
-        0x00,
-        0xA0,
-        0x00,
-        0xB0,
-        0x1C,
-        0xFF,
-        0x00,
-        0xC0,
-        0x00,
-        0xD0,
-        0xE0,
-        0x05,
-        0xFF,
-    ]);
+    let cli_commands = extract_cli_commands();
+    let memory = io::load_file(&cli_commands.filename);
+    let inputs = io::load_inputs(&cli_commands.input);
+
+    let state = State::new(memory, inputs);
     let final_state = state.start();
 
     println!("--- FINAL MEMORY ---");

@@ -11,17 +11,12 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(memory: &[u8]) -> State {
-        let mut new_memory = [0x00; 255];
-        for (i, item) in memory.iter().enumerate() {
-            new_memory[i] = *item;
-        }
-
+    pub fn new(memory: [u8; 255], inputs: [u8; 255]) -> State {
         State {
-            memory: new_memory,
+            memory,
             pc: 0,
             ac: 0,
-            inputs: [0x00; 255],
+            inputs,
             halt: false,
         }
     }
