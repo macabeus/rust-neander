@@ -1,5 +1,6 @@
 mod operator;
 use state::operator::Operator;
+use state::operator::NOP;
 use state::operator::get_operator;
 
 pub struct State {
@@ -63,13 +64,13 @@ impl State {
         (operator.run)(self, operator_argument)
     }
 
-    pub fn memory_to_str(&self, limit: usize) -> std::vec::Vec<String> {
-        let mut output: Vec<String> = vec![String::new(); 255];
+    pub fn list_operators(&self, limit: usize) -> std::vec::Vec<(Operator, u8)> {
+        let mut output: Vec<(Operator, u8)> = vec![(NOP, 0x00); 255];
 
         for (num, memory) in self.memory[..limit].iter().enumerate() {
             match get_operator(memory) {
-                Some(operator) => output[num] = format!("[{:?}] {:#04X}", operator.mnemonic, memory).to_string(),
-                None => output[num] = format!("[   ] {:#04X}", memory).to_string(),
+                Some(operator) => output[num] = (operator, *memory),
+                None => output[num] = (NOP, *memory),
             }
         }
 
