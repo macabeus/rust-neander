@@ -63,13 +63,17 @@ impl State {
         (operator.run)(self, operator_argument)
     }
 
-    pub fn print_memory(self, limit: usize) {
-        for i in self.memory[..limit].iter() {
-            match get_operator(i) {
-                Some(operator) => println!("[{:?}] {:#04X}", operator.mnemonic, i),
-                None => println!("[   ] {:#04X}", i),
+    pub fn memory_to_str(&self, limit: usize) -> std::vec::Vec<String> {
+        let mut output: Vec<String> = vec![String::new(); 255];
+
+        for (num, memory) in self.memory[..limit].iter().enumerate() {
+            match get_operator(memory) {
+                Some(operator) => output[num] = format!("[{:?}] {:#04X}", operator.mnemonic, memory).to_string(),
+                None => output[num] = format!("[   ] {:#04X}", memory).to_string(),
             }
         }
+
+        output
     }
 }
 

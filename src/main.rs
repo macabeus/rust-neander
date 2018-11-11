@@ -2,6 +2,7 @@
 extern crate clap;
 mod state;
 mod io;
+mod ui;
 use state::State;
 use clap::App;
 
@@ -20,7 +21,7 @@ fn extract_cli_commands() -> CLICommands {
     }
 }
 
-fn main() {
+fn main() -> Result<(), Box<std::error::Error>> {
     let cli_commands = extract_cli_commands();
     let memory = io::load_file(&cli_commands.filename);
     let inputs = io::load_inputs(&cli_commands.input);
@@ -28,7 +29,6 @@ fn main() {
     let state = State::new(memory, inputs);
     let final_state = state.start();
 
-    println!("--- FINAL MEMORY ---");
-    final_state.print_memory(30);
+    ui::draw_screen(final_state)
 }
 

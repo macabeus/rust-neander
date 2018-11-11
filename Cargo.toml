@@ -4,4 +4,6 @@ version = "0.1.0"
 authors = ["macabeus"]
 
 [dependencies]
+tui = "0.3.0"
+termion = "1.5.1"
 clap = {version = "2.32", features = ["yaml"]}
