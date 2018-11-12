@@ -1,4 +1,4 @@
-mod operator;
+pub mod operator;
 use state::operator::Operator;
 use state::operator::NOP;
 use state::operator::get_operator;

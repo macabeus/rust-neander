@@ -1,12 +1,13 @@
 extern crate termion;
 extern crate tui;
+mod memory_list;
 use state::State;
 use std::io::{stdout, stdin};
 use ui::tui::Terminal;
 use ui::tui::backend::TermionBackend;
 use ui::tui::widgets::{Widget, Block, Borders, Text, List};
 use ui::tui::layout::{Layout, Constraint, Direction};
-use ui::termion::{color, clear, cursor};
+use ui::termion::clear;
 use ui::termion::event::Key;
 use ui::termion::input::TermRead;
 use ui::termion::raw::IntoRawMode;
@@ -32,30 +33,16 @@ pub fn draw_screen(final_state: State) -> Result<(), Box<std::error::Error>> {
             let memory_str_table = list_operators_result
                 .iter()
                 .enumerate()
-                .map(|(i, (operator, memory))| {
-                     let memory_str = format!("{:#04X}", memory);
-                     if i > 0 && list_operators_result[i - 1].0.requires_arg {
-                         return Text::raw(
-                            format!(
-                                 " {:#04X}:           {red}{}{reset}",
-                                 i, memory_str,
-                                 red = color::Fg(color::Red),
-                                 reset = color::Fg(color::Reset)
-                            )
+                .map(|(i, (operator, memory))|
+                    Text::raw(
+                        memory_list::format_memory_line(
+                            &list_operators_result,
+                            &i,
+                            &operator,
+                            &memory
                         )
-                     }
-
-                     Text::raw(
-                         format!(
-                             " {:#04X}: {color}{:?}{blue} {goto}{}{reset}",
-                             i, operator.mnemonic, memory_str,
-                             color = color::Fg(color::Green),
-                             blue = color::Fg(color::LightBlue),
-                             goto = cursor::Left(18),
-                             reset = color::Fg(color::Reset)
-                         )
-                     )
-                });
+                    )
+                );
 
             List::new(memory_str_table)
               .block(Block::default().borders(Borders::ALL).title(" Memory "))
