@@ -1,6 +1,7 @@
 extern crate termion;
 extern crate tui;
 mod memory_list;
+mod status;
 use state::State;
 use std::io::{stdout, stdin};
 use ui::tui::Terminal;
@@ -23,12 +24,17 @@ pub fn draw_screen(final_state: State) -> Result<(), Box<std::error::Error>> {
 
     'main: loop {
         terminal.draw(|mut f| {
+            // Layout
             let chunks = Layout::default()
                 .direction(Direction::Horizontal)
-                .constraints([Constraint::Percentage(100), Constraint::Percentage(100)].as_ref())
+                .constraints([Constraint::Percentage(20), Constraint::Percentage(100)].as_ref())
                 .split(size);
 
-            let code_list_lines_size = (chunks[0].height - 2) as usize;
+            // Status
+            status::draw(&final_state, &mut f, chunks[0]);
+
+            // Memory list
+            let code_list_lines_size = (chunks[1].height - 2) as usize;
             let list_operators_result = final_state.list_operators(code_list_lines_size);
             let memory_str_table = list_operators_result
                 .iter()
@@ -46,7 +52,7 @@ pub fn draw_screen(final_state: State) -> Result<(), Box<std::error::Error>> {
 
             List::new(memory_str_table)
               .block(Block::default().borders(Borders::ALL).title(" Memory "))
-              .render(&mut f, chunks[0]);
+              .render(&mut f, chunks[1]);
         })?;
 
         for c in stdin().keys() {

@@ -5,10 +5,10 @@ use state::operator::get_operator;
 
 pub struct State {
     memory: [u8; 255],
-    pc: usize,
-    ac: u8,
+    pub pc: usize,
+    pub ac: u8,
     inputs: [u8; 255],
-    halt: bool,
+    pub halt: bool,
 }
 
 impl State {
