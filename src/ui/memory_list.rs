@@ -1,4 +1,9 @@
+use state::State;
 use state::operator::Operator;
+use ui::tui::backend::Backend;
+use ui::tui::widgets::{Widget, Block, Borders, Text, List};
+use ui::tui::layout::Rect;
+use ui::tui::Frame;
 use ui::termion::{color, cursor};
 
 macro_rules! MNEMONIC_COLOR { () => { color::Fg(color::Green) } }
@@ -34,7 +39,7 @@ fn previous_argument_require_argument(memory: &std::vec::Vec<(Operator, u8)>, po
     previous_operator.requires_arg
 }
 
-pub fn format_memory_line(
+fn format_memory_line(
     memory: &std::vec::Vec<(Operator, u8)>,
     position: &usize,
     operator: &Operator,
@@ -47,3 +52,27 @@ pub fn format_memory_line(
     }
 }
 
+pub fn draw<B>(final_state: &State, f: &mut Frame<B>, area: Rect)
+where
+    B: Backend,
+{
+    let code_list_lines_size = (area.height - 2) as usize;
+    let list_operators_result = final_state.list_operators(code_list_lines_size);
+    let memory_str_table = list_operators_result
+        .iter()
+        .enumerate()
+        .map(|(i, (operator, memory))|
+            Text::raw(
+                format_memory_line(
+                    &list_operators_result,
+                    &i,
+                    &operator,
+                    &memory
+                )
+            )
+        );
+
+    List::new(memory_str_table)
+      .block(Block::default().borders(Borders::ALL).title(" Memory "))
+      .render(f, area);
+}
