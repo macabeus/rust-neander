@@ -22,13 +22,7 @@ impl State {
         }
     }
 
-    fn show(&self) {
-        println!("PC: {}", self.pc);
-        println!("AC: {}", self.ac);
-        println!("--------");
-    }
-
-    pub fn start(self) -> State {
+    pub fn next_tick(self) -> State {
         let operator = self.fetch_operator();
 
         let operator_argument: u8;
@@ -38,18 +32,13 @@ impl State {
             operator_argument = 0;
         }
 
-        let new_state = self.execute_operator(operator, operator_argument);
-        new_state.show();
+        let mut new_state = self.execute_operator(operator, operator_argument);
 
-        if new_state.halt == true {
-            println!("Finish: halt");
-            new_state
-        } else if new_state.pc >= 255 {
-            println!("Finish: end of memory");
-            new_state
-        } else {
-            new_state.start()
+        if new_state.pc >= 255 {
+            new_state.halt = true;
         }
+
+        new_state
     }
 
     fn fetch_operator(&self) -> Operator {
@@ -60,7 +49,6 @@ impl State {
     }
 
     fn execute_operator(self, operator: Operator, operator_argument: u8) -> State {
-        println!("{:?}", operator.mnemonic);
         (operator.run)(self, operator_argument)
     }
 

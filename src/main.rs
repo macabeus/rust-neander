@@ -27,8 +27,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
     let inputs = io::load_inputs(&cli_commands.input);
 
     let state = State::new(memory, inputs);
-    let final_state = state.start();
 
-    ui::draw_screen(final_state)
+    ui::draw_screen(state)
 }
 
