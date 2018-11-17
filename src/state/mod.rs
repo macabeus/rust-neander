@@ -64,10 +64,10 @@ impl State {
         (operator.run)(self, operator_argument)
     }
 
-    pub fn list_operators(&self, limit: usize) -> std::vec::Vec<(Operator, u8)> {
-        let mut output: Vec<(Operator, u8)> = vec![(NOP, 0x00); 255];
+    pub fn list_operators(&self) -> std::vec::Vec<(Operator, u8)> {
+        let mut output: Vec<(Operator, u8)> = vec![(NOP, 0x00); 256];
 
-        for (num, memory) in self.memory[..limit].iter().enumerate() {
+        for (num, memory) in self.memory.iter().enumerate() {
             match get_operator(memory) {
                 Some(operator) => output[num] = (operator, *memory),
                 None => output[num] = (NOP, *memory),

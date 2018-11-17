@@ -2,6 +2,8 @@ extern crate termion;
 extern crate tui;
 mod memory_list;
 mod status;
+mod uistate;
+use ui::uistate::UIState;
 use state::State;
 use std::io::{stdout, stdin};
 use ui::tui::Terminal;
@@ -20,22 +22,57 @@ pub fn draw_screen(final_state: State) -> Result<(), Box<std::error::Error>> {
 
     let size = terminal.size()?;
 
+    let chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(20), Constraint::Percentage(100)].as_ref())
+        .split(size);
+    let memory_list_count_line = (chunks[1].height - 3) as usize;
+
+    let mut uistate = UIState {
+        current_line: 0,
+        memory_list_first_line: 0,
+        memory_list_last_line: memory_list_count_line,
+    };
+
     println!("{}", clear::All);
 
     'main: loop {
         terminal.draw(|mut f| {
-            let chunks = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Percentage(20), Constraint::Percentage(100)].as_ref())
-                .split(size);
-
             status::draw(&final_state, &mut f, chunks[0]);
-            memory_list::draw(&final_state, &mut f, chunks[1]);
+            memory_list::draw(&uistate, &final_state, &mut f, chunks[1]);
         })?;
 
         for c in stdin().keys() {
             match c? {
                 Key::Char('q') => break 'main Ok(()),
+                Key::Up => {
+                    if uistate.current_line == 0 {
+                        break;
+                    }
+
+                    uistate.current_line -= 1;
+
+                    if uistate.memory_list_first_line + 3 > uistate.current_line && uistate.memory_list_first_line > 0 {
+                        uistate.memory_list_first_line -= 1;
+                        uistate.memory_list_last_line -= 1;
+                    }
+
+                    break;
+                },
+                Key::Down => {
+                    if uistate.current_line == 0xFF {
+                        break;
+                    }
+
+                    uistate.current_line += 1;
+
+                    if uistate.memory_list_last_line - 3 < uistate.current_line && uistate.memory_list_last_line < 0xFF {
+                        uistate.memory_list_first_line += 1;
+                        uistate.memory_list_last_line += 1;
+                    }
+
+                    break;
+                },
                 _ => {}
             }
         }

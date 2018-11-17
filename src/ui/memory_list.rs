@@ -1,5 +1,6 @@
 use state::State;
 use state::operator::Operator;
+use ui::uistate::UIState;
 use ui::tui::backend::Backend;
 use ui::tui::widgets::{Widget, Block, Borders, Text, List};
 use ui::tui::layout::Rect;
@@ -7,14 +8,14 @@ use ui::tui::Frame;
 
 fn format_operator_line(position: &usize, operator: &Operator, operator_memory: &u8) -> String {
     format!(
-        " {:#04X}: {:?}  {:#04X}",
+        "{:#04X}: {:?}  {:#04X}",
         position, operator.mnemonic, operator_memory,
     )
 }
 
 fn format_argument_line(position: &usize, argument: &u8) -> String {
     format!(
-        " {:#04X}:           {:#04X}",
+        "{:#04X}:           {:#04X}",
         position, argument,
     )
 }
@@ -29,32 +30,41 @@ fn previous_argument_require_argument(memory: &std::vec::Vec<(Operator, u8)>, po
 }
 
 fn format_memory_line(
+    uistate: &UIState,
     memory: &std::vec::Vec<(Operator, u8)>,
     position: &usize,
     operator: &Operator,
     memory_value: &u8
 ) -> String {
-    if previous_argument_require_argument(memory, position) {
+    let line = if previous_argument_require_argument(memory, position) {
         format_argument_line(position, memory_value)
     } else {
         format_operator_line(position, operator, memory_value)
+    };
+
+    if *position == uistate.current_line {
+        format!(" -> {}", line)
+    } else {
+        format!("    {}", line)
     }
 }
 
-pub fn draw<B>(final_state: &State, f: &mut Frame<B>, area: Rect)
+pub fn draw<B>(uistate: &UIState, final_state: &State, f: &mut Frame<B>, area: Rect)
 where
     B: Backend,
 {
-    let code_list_lines_size = (area.height - 2) as usize;
-    let list_operators_result = final_state.list_operators(code_list_lines_size);
-    let memory_str_table = list_operators_result
+    let list_operators = final_state.list_operators();
+    let list_operators_slice = &list_operators[uistate.memory_list_first_line..=uistate.memory_list_last_line];
+
+    let memory_str_table = list_operators_slice
         .iter()
         .enumerate()
         .map(|(i, (operator, memory))|
             Text::raw(
                 format_memory_line(
-                    &list_operators_result,
-                    &i,
+                    uistate,
+                    &list_operators,
+                    &(i + uistate.memory_list_first_line),
                     &operator,
                     &memory
                 )
