@@ -3,6 +3,7 @@ use state::operator::Operator;
 use state::operator::NOP;
 use state::operator::get_operator;
 
+#[derive(Copy, Clone)]
 pub struct State {
     memory: [u8; 255],
     pub pc: usize,

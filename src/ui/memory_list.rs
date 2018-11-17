@@ -49,11 +49,11 @@ fn format_memory_line(
     }
 }
 
-pub fn draw<B>(uistate: &UIState, final_state: &State, f: &mut Frame<B>, area: Rect)
+pub fn draw<B>(uistate: &UIState, current_state: &State, f: &mut Frame<B>, area: Rect)
 where
     B: Backend,
 {
-    let list_operators = final_state.list_operators();
+    let list_operators = current_state.list_operators();
     let list_operators_slice = &list_operators[uistate.memory_list_first_line..=uistate.memory_list_last_line];
 
     let memory_str_table = list_operators_slice

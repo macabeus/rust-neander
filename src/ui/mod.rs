@@ -14,7 +14,7 @@ use ui::termion::event::Key;
 use ui::termion::input::TermRead;
 use ui::termion::raw::IntoRawMode;
 
-pub fn draw_screen(final_state: State) -> Result<(), Box<std::error::Error>> {
+pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
     let stdout_raw_mode = stdout().into_raw_mode()?;
     let backend = TermionBackend::new(stdout_raw_mode);
     let mut terminal = Terminal::new(backend)?;
@@ -34,17 +34,23 @@ pub fn draw_screen(final_state: State) -> Result<(), Box<std::error::Error>> {
         memory_list_last_line: memory_list_count_line,
     };
 
+    let mut current_state = state;
+
     println!("{}", clear::All);
 
     'main: loop {
         terminal.draw(|mut f| {
-            status::draw(&final_state, &mut f, chunks[0]);
-            memory_list::draw(&uistate, &final_state, &mut f, chunks[1]);
+            status::draw(&current_state, &mut f, chunks[0]);
+            memory_list::draw(&uistate, &current_state, &mut f, chunks[1]);
         })?;
 
         for c in stdin().keys() {
             match c? {
                 Key::Char('q') => break 'main Ok(()),
+                Key::Char('n') => {
+                    current_state = current_state.next_tick();
+                    break;
+                },
                 Key::Up => {
                     if uistate.current_line == 0 {
                         break;
