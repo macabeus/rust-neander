@@ -4,29 +4,18 @@ use ui::tui::backend::Backend;
 use ui::tui::widgets::{Widget, Block, Borders, Text, List};
 use ui::tui::layout::Rect;
 use ui::tui::Frame;
-use ui::termion::{color, cursor};
-
-macro_rules! MNEMONIC_COLOR { () => { color::Fg(color::Green) } }
-macro_rules! OPERATOR_MEMORY_COLOR { () => { color::Fg(color::LightBlue) } }
-macro_rules! ARGUMENT_COLOR { () => { color::Fg(color::Red) } }
 
 fn format_operator_line(position: &usize, operator: &Operator, operator_memory: &u8) -> String {
     format!(
-        " {:#04X}: {mnemonic_color}{:?}{operator_memory_color} {goto}{:#04X}{reset}",
+        " {:#04X}: {:?}  {:#04X}",
         position, operator.mnemonic, operator_memory,
-        mnemonic_color = MNEMONIC_COLOR!(),
-        operator_memory_color = OPERATOR_MEMORY_COLOR!(),
-        goto = cursor::Left(18),
-        reset = color::Fg(color::Reset)
     )
 }
 
 fn format_argument_line(position: &usize, argument: &u8) -> String {
     format!(
-        " {:#04X}:           {argument_color}{:#04X}{reset}",
+        " {:#04X}:           {:#04X}",
         position, argument,
-        argument_color = ARGUMENT_COLOR!(),
-        reset = color::Fg(color::Reset)
     )
 }
 
