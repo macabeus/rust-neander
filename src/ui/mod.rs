@@ -16,6 +16,7 @@ pub fn draw_screen(final_state: State) -> Result<(), Box<std::error::Error>> {
     let stdout_raw_mode = stdout().into_raw_mode()?;
     let backend = TermionBackend::new(stdout_raw_mode);
     let mut terminal = Terminal::new(backend)?;
+    terminal.hide_cursor()?;
 
     let size = terminal.size()?;
 
