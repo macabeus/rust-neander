@@ -5,7 +5,7 @@ use state::operator::get_operator;
 
 #[derive(Copy, Clone)]
 pub struct State {
-    memory: [u8; 255],
+    pub memory: [u8; 255],
     pub pc: usize,
     pub ac: u8,
     inputs: [u8; 255],

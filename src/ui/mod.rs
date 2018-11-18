@@ -32,6 +32,8 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
         current_line: 0,
         memory_list_first_line: 0,
         memory_list_last_line: memory_list_count_line,
+        is_typing: false,
+        typing_char: None,
     };
 
     let mut current_state = state;
@@ -47,6 +49,11 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
         for c in stdin().keys() {
             match c? {
                 Key::Char('q') => break 'main Ok(()),
+                Key::Esc => {
+                    uistate.is_typing = false;
+                    uistate.typing_char = None;
+                    break;
+                },
                 Key::Char('n') => {
                     current_state = current_state.next_tick();
                     break;
@@ -77,6 +84,23 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
                         uistate.memory_list_last_line += 1;
                     }
 
+                    break;
+                },
+                Key::Char(key) => {
+                    match key {
+                        '0'...'9' | 'A'...'F' | 'a'...'f' => {
+                            if uistate.is_typing {
+                                let s = format!("{}{}", uistate.typing_char.unwrap(), key).to_string();
+                                current_state.memory[uistate.current_line] = u8::from_str_radix(&s, 16)?;
+                                uistate.is_typing = false;
+                                uistate.typing_char = None;
+                            } else {
+                                uistate.is_typing = true;
+                                uistate.typing_char = Some(key);
+                            }
+                        },
+                        _ => {},
+                    };
                     break;
                 },
                 _ => {}

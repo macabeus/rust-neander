@@ -20,6 +20,20 @@ fn format_argument_line(position: &usize, argument: &u8) -> String {
     )
 }
 
+fn format_typing_operator_line(position: &usize, typing: char) -> String {
+    format!(
+        "{:#04X}:      0x{}_",
+        position, typing,
+    )
+}
+
+fn format_typing_argument_line(position: &usize, typing: char) -> String {
+    format!(
+        "{:#04X}:           0x{}_",
+        position, typing,
+    )
+}
+
 fn previous_argument_require_argument(memory: &std::vec::Vec<(Operator, u8)>, position: &usize) -> bool {
     if position == &0 {
         return false
@@ -36,13 +50,17 @@ fn format_memory_line(
     operator: &Operator,
     memory_value: &u8
 ) -> String {
-    let line = if previous_argument_require_argument(memory, position) {
-        format_argument_line(position, memory_value)
-    } else {
-        format_operator_line(position, operator, memory_value)
+    let is_an_argument = previous_argument_require_argument(memory, position);
+    let is_current_line = *position == uistate.current_line;
+
+    let line = match (is_an_argument, is_current_line, uistate.is_typing) {
+        (false, true, true) => format_typing_operator_line(position, uistate.typing_char.unwrap()),
+        (true, true, true) => format_typing_argument_line(position, uistate.typing_char.unwrap()),
+        (false, _, _) => format_operator_line(position, operator, memory_value),
+        (true, _, _) => format_argument_line(position, memory_value),
     };
 
-    if *position == uistate.current_line {
+    if is_current_line {
         format!(" -> {}", line)
     } else {
         format!("    {}", line)
