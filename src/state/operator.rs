@@ -244,24 +244,24 @@ pub const HLT: Operator = Operator {
     },
 };
 
-pub fn get_operator(code: &u8) -> Option<Operator> {
+pub fn get_operator(code: &u8) -> Operator {
     match code {
-        0x00 ... 0x0F => Some(NOP),
-        0x10 ... 0x1F => Some(STA),
-        0x20 ... 0x2F => Some(LDA),
-        0x30 ... 0x3F => Some(ADD),
-        0x40 ... 0x4F => Some(OR),
-        0x50 ... 0x5F => Some(AND),
-        0x60 ... 0x6F => Some(NOT),
-        0x70 ... 0x7F => Some(SUB),
-        0x80 ... 0x8F => Some(JMP),
-        0x90 ... 0x9F => Some(JN),
-        0xA0 ... 0xAF => Some(JZ),
-        0xB0 ... 0xBF => Some(JNZ),
-        0xC0 ... 0xCF => Some(IN),
-        0xD0 ... 0xDF => Some(OUT),
-        0xE0 ... 0xEF => Some(LDI),
-        0xF0 ... 0xFF => Some(HLT),
-        _ => None,
+        0x00 ... 0x0F => NOP,
+        0x10 ... 0x1F => STA,
+        0x20 ... 0x2F => LDA,
+        0x30 ... 0x3F => ADD,
+        0x40 ... 0x4F => OR,
+        0x50 ... 0x5F => AND,
+        0x60 ... 0x6F => NOT,
+        0x70 ... 0x7F => SUB,
+        0x80 ... 0x8F => JMP,
+        0x90 ... 0x9F => JN,
+        0xA0 ... 0xAF => JZ,
+        0xB0 ... 0xBF => JNZ,
+        0xC0 ... 0xCF => IN,
+        0xD0 ... 0xDF => OUT,
+        0xE0 ... 0xEF => LDI,
+        0xF0 ... 0xFF => HLT,
+        opcode => panic!("Unknow OpCode: {:#04X}", opcode),
     }
 }

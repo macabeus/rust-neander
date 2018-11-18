@@ -1,5 +1,7 @@
 use state::State;
 use state::operator::Operator;
+use state::memory_line::LineKind;
+use state::memory_line::MemoryLine;
 use ui::uistate::UIState;
 use ui::tui::backend::Backend;
 use ui::tui::widgets::{Widget, Block, Borders, Text, List};
@@ -34,30 +36,18 @@ fn format_typing_argument_line(position: &usize, typing: char) -> String {
     )
 }
 
-fn previous_argument_require_argument(memory: &std::vec::Vec<(Operator, u8)>, position: &usize) -> bool {
-    if position == &0 {
-        return false
-    }
-
-    let previous_operator = &memory[position - 1].0;
-    previous_operator.requires_arg
-}
-
 fn format_memory_line(
     uistate: &UIState,
-    memory: &std::vec::Vec<(Operator, u8)>,
+    memory_line: &MemoryLine,
     position: &usize,
-    operator: &Operator,
-    memory_value: &u8
 ) -> String {
-    let is_an_argument = previous_argument_require_argument(memory, position);
     let is_current_line = *position == uistate.current_line;
 
-    let line = match (is_an_argument, is_current_line, uistate.is_typing) {
-        (false, true, true) => format_typing_operator_line(position, uistate.typing_char.unwrap()),
-        (true, true, true) => format_typing_argument_line(position, uistate.typing_char.unwrap()),
-        (false, _, _) => format_operator_line(position, operator, memory_value),
-        (true, _, _) => format_argument_line(position, memory_value),
+    let line = match (memory_line.kind, is_current_line, uistate.is_typing) {
+        (LineKind::Operator, true, true) => format_typing_operator_line(position, uistate.typing_char.unwrap()),
+        (LineKind::Argument, true, true) => format_typing_argument_line(position, uistate.typing_char.unwrap()),
+        (LineKind::Operator, _, _) => format_operator_line(position, &memory_line.operator, &memory_line.value),
+        (LineKind::Argument, _, _) => format_argument_line(position, &memory_line.value),
     };
 
     if is_current_line {
@@ -77,14 +67,12 @@ where
     let memory_str_table = list_operators_slice
         .iter()
         .enumerate()
-        .map(|(i, (operator, memory))|
+        .map(|(i, memory_line)|
             Text::raw(
                 format_memory_line(
                     uistate,
-                    &list_operators,
+                    memory_line,
                     &(i + uistate.memory_list_first_line),
-                    &operator,
-                    &memory
                 )
             )
         );

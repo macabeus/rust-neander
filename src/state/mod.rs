@@ -1,7 +1,10 @@
 pub mod operator;
+pub mod memory_line;
 use state::operator::Operator;
-use state::operator::NOP;
 use state::operator::get_operator;
+use state::memory_line::LineKind;
+use state::memory_line::MemoryLine;
+use state::memory_line::MEMORY_LINE_BLANK;
 
 #[derive(Copy, Clone)]
 pub struct State {
@@ -43,23 +46,34 @@ impl State {
     }
 
     fn fetch_operator(&self) -> Operator {
-        match get_operator(&self.memory[self.pc]) {
-            Some(operator) => operator,
-            None => panic!("Unknow OpCode: {:#04X}", self.memory[self.pc]),
-        }
+        get_operator(&self.memory[self.pc])
     }
 
     fn execute_operator(self, operator: Operator, operator_argument: u8) -> State {
         (operator.run)(self, operator_argument)
     }
 
-    pub fn list_operators(&self) -> std::vec::Vec<(Operator, u8)> {
-        let mut output: Vec<(Operator, u8)> = vec![(NOP, 0x00); 256];
+    pub fn list_operators(&self) -> std::vec::Vec<MemoryLine> {
+        let mut output: Vec<MemoryLine> = vec![MEMORY_LINE_BLANK; 256];
+        let mut line_kind = LineKind::Operator;
 
         for (num, memory) in self.memory.iter().enumerate() {
-            match get_operator(memory) {
-                Some(operator) => output[num] = (operator, *memory),
-                None => output[num] = (NOP, *memory),
+            let operator = get_operator(memory);
+            output[num] = MemoryLine {
+                operator,
+                value: *memory,
+                kind: line_kind,
+            };
+
+            match line_kind {
+                LineKind::Operator => {
+                    if operator.requires_arg {
+                        line_kind = LineKind::Argument;
+                    }
+                },
+                LineKind::Argument => {
+                    line_kind = LineKind::Operator;
+                },
             }
         }
 
