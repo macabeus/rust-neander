@@ -24,7 +24,7 @@ pub enum OpCode {
 pub struct Operator {
     pub mnemonic: OpCode,
     pub requires_arg: bool,
-    pub run: fn(State, u8) -> State,
+    pub run: fn(&State, u8) -> State,
 }
 
 pub const NOP: Operator = Operator {
@@ -33,7 +33,7 @@ pub const NOP: Operator = Operator {
     run: |state, _| {
         State {
             pc: state.pc + 1,
-            ..state
+            ..*state
         }
     },
 };
@@ -48,7 +48,7 @@ pub const STA: Operator = Operator {
         State {
             pc: state.pc + 2,
             memory,
-            ..state
+            ..*state
         }
     }
 };
@@ -60,7 +60,7 @@ pub const LDA: Operator = Operator {
         State {
             pc: state.pc + 2,
             ac: state.memory[argument as usize],
-            ..state
+            ..*state
         }
     }
 };
@@ -74,7 +74,7 @@ pub const ADD: Operator = Operator {
         State {
             pc: state.pc + 2,
             ac: state.ac + memory_value,
-            ..state
+            ..*state
         }
     }
 };
@@ -88,7 +88,7 @@ pub const OR: Operator = Operator {
         State {
             pc: state.pc + 2,
             ac: memory_value | state.ac,
-            ..state
+            ..*state
         }
     }
 };
@@ -102,7 +102,7 @@ pub const AND: Operator = Operator {
         State {
             pc: state.pc + 2,
             ac: memory_value & state.ac,
-            ..state
+            ..*state
         }
     }
 };
@@ -114,7 +114,7 @@ pub const NOT: Operator = Operator {
         State {
             pc: state.pc + 1,
             ac: !state.ac,
-            ..state
+            ..*state
         }
     }
 };
@@ -128,7 +128,7 @@ pub const SUB: Operator = Operator {
         State {
             pc: state.pc + 2,
             ac: state.ac - memory_value,
-            ..state
+            ..*state
         }
     }
 };
@@ -139,7 +139,7 @@ pub const JMP: Operator = Operator {
     run: |state, argument| {
         State {
             pc: argument as usize,
-            ..state
+            ..*state
         }
     }
 };
@@ -156,7 +156,7 @@ pub const JN: Operator = Operator {
 
         State {
             pc: next_pc,
-            ..state
+            ..*state
         }
     }
 };
@@ -173,7 +173,7 @@ pub const JZ: Operator = Operator {
 
         State {
             pc: next_pc,
-            ..state
+            ..*state
         }
     }
 };
@@ -190,7 +190,7 @@ pub const JNZ: Operator = Operator {
 
         State {
             pc: next_pc,
-            ..state
+            ..*state
         }
     }
 };
@@ -202,7 +202,7 @@ pub const IN: Operator = Operator {
         State {
             pc: state.pc + 2,
             ac: state.inputs[argument as usize],
-            ..state
+            ..*state
         }
     }
 };
@@ -215,7 +215,7 @@ pub const OUT: Operator = Operator {
 
         State {
             pc: state.pc + 1,
-            ..state
+            ..*state
         }
     }
 };
@@ -227,7 +227,7 @@ pub const LDI: Operator = Operator {
         State {
             pc: state.pc + 2,
             ac: argument,
-            ..state
+            ..*state
         }
     }
 };
@@ -239,7 +239,7 @@ pub const HLT: Operator = Operator {
         State {
             pc: state.pc + 1,
             halt: true,
-            ..state
+            ..*state
         }
     },
 };

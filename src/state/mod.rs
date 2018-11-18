@@ -6,7 +6,6 @@ use state::memory_line::LineKind;
 use state::memory_line::MemoryLine;
 use state::memory_line::MEMORY_LINE_BLANK;
 
-#[derive(Copy, Clone)]
 pub struct State {
     pub memory: [u8; 255],
     pub pc: usize,
@@ -26,7 +25,7 @@ impl State {
         }
     }
 
-    pub fn next_tick(self) -> State {
+    pub fn next_tick(&self) -> State {
         let operator = self.fetch_operator();
 
         let operator_argument: u8;
@@ -49,7 +48,7 @@ impl State {
         get_operator(&self.memory[self.pc])
     }
 
-    fn execute_operator(self, operator: Operator, operator_argument: u8) -> State {
+    fn execute_operator(&self, operator: Operator, operator_argument: u8) -> State {
         (operator.run)(self, operator_argument)
     }
 
