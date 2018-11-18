@@ -3,15 +3,14 @@ extern crate tui;
 mod memory_list;
 mod status;
 mod uistate;
+mod action;
 use ui::uistate::UIState;
 use state::State;
-use std::io::{stdout, stdin};
+use std::io::stdout;
 use ui::tui::Terminal;
 use ui::tui::backend::TermionBackend;
 use ui::tui::layout::{Layout, Constraint, Direction};
 use ui::termion::clear;
-use ui::termion::event::Key;
-use ui::termion::input::TermRead;
 use ui::termion::raw::IntoRawMode;
 
 pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
@@ -34,77 +33,24 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
         memory_list_last_line: memory_list_count_line,
         is_typing: false,
         typing_char: None,
+        quit: false,
     };
 
     let mut current_state = state;
 
     println!("{}", clear::All);
 
-    'main: loop {
+    loop {
         terminal.draw(|mut f| {
             status::draw(&current_state, &mut f, chunks[0]);
             memory_list::draw(&uistate, &current_state, &mut f, chunks[1]);
         })?;
 
-        for c in stdin().keys() {
-            match c? {
-                Key::Char('q') => break 'main Ok(()),
-                Key::Esc => {
-                    uistate.is_typing = false;
-                    uistate.typing_char = None;
-                    break;
-                },
-                Key::Char('n') => {
-                    current_state = current_state.next_tick();
-                    break;
-                },
-                Key::Up => {
-                    if uistate.current_line == 0 {
-                        break;
-                    }
+        let input = action::wait_for_valid_input();
+        action::execute(input, &mut current_state, &mut uistate);
 
-                    uistate.current_line -= 1;
-
-                    if uistate.memory_list_first_line + 3 > uistate.current_line && uistate.memory_list_first_line > 0 {
-                        uistate.memory_list_first_line -= 1;
-                        uistate.memory_list_last_line -= 1;
-                    }
-
-                    break;
-                },
-                Key::Down => {
-                    if uistate.current_line == 0xFF {
-                        break;
-                    }
-
-                    uistate.current_line += 1;
-
-                    if uistate.memory_list_last_line - 3 < uistate.current_line && uistate.memory_list_last_line < 0xFF {
-                        uistate.memory_list_first_line += 1;
-                        uistate.memory_list_last_line += 1;
-                    }
-
-                    break;
-                },
-                Key::Char(key) => {
-                    match key {
-                        '0'...'9' | 'A'...'F' | 'a'...'f' => {
-                            if uistate.is_typing {
-                                let s = format!("{}{}", uistate.typing_char.unwrap(), key).to_string();
-                                current_state.memory[uistate.current_line] = u8::from_str_radix(&s, 16)?;
-                                uistate.is_typing = false;
-                                uistate.typing_char = None;
-                            } else {
-                                uistate.is_typing = true;
-                                uistate.typing_char = Some(key);
-                            }
-                        },
-                        _ => {},
-                    };
-                    break;
-                },
-                _ => {}
-            }
+        if uistate.quit {
+            break Ok(())
         }
     }
 }

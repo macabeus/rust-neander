@@ -4,5 +4,6 @@ pub struct UIState {
     pub memory_list_last_line: usize,
     pub is_typing: bool,
     pub typing_char: Option<char>,
+    pub quit: bool,
 }
 
