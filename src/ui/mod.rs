@@ -4,6 +4,7 @@ mod memory_list;
 mod status;
 mod uistate;
 mod action;
+mod output;
 use ui::uistate::UIState;
 use state::State;
 use std::io::stdout;
@@ -21,11 +22,19 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
 
     let size = terminal.size()?;
 
-    let chunks = Layout::default()
+    let chunks_main = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(20), Constraint::Percentage(100)].as_ref())
+        .constraints([Constraint::Percentage(20), Constraint::Percentage(80)].as_ref())
         .split(size);
-    let memory_list_count_line = (chunks[1].height - 3) as usize;
+    let chunks_left_bar = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Percentage(30), Constraint::Percentage(70)].as_ref())
+        .split(chunks_main[0]);
+    let status_chunk = chunks_left_bar[0];
+    let output_chunk = chunks_left_bar[1];
+    let memory_list_chunk = chunks_main[1];
+
+    let memory_list_count_line = (memory_list_chunk.height - 3) as usize;
 
     let mut uistate = UIState {
         current_line: 0,
@@ -42,8 +51,9 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
 
     loop {
         terminal.draw(|mut f| {
-            status::draw(&current_state, &mut f, chunks[0]);
-            memory_list::draw(&uistate, &current_state, &mut f, chunks[1]);
+            status::draw(&current_state, &mut f, status_chunk);
+            output::draw(&current_state, &mut f, output_chunk);
+            memory_list::draw(&uistate, &current_state, &mut f, memory_list_chunk);
         })?;
 
         let input = action::wait_for_valid_input();
