@@ -7,6 +7,7 @@ use ui::termion::event::Key;
 pub enum Input {
     NextTick,
     Play,
+    ToggleHalt,
     MoveUpCursor,
     MoveDownCursor,
     TypeChar(char),
@@ -20,6 +21,7 @@ pub fn wait_for_valid_input() -> Input {
         match c.unwrap() {
             Key::Char('n') => return Input::NextTick,
             Key::Char('p') => return Input::Play,
+            Key::Char('h') => return Input::ToggleHalt,
             Key::Up => return Input::MoveUpCursor,
             Key::Down => return Input::MoveDownCursor,
             Key::Esc => return Input::CancelType,
@@ -40,6 +42,7 @@ pub fn execute(input: Input, state: &mut State, uistate: &mut UIState) {
     match input {
         Input::NextTick => next_tick_handle(state),
         Input::Play => play_handle(state),
+        Input::ToggleHalt => toggle_halt_handle(state),
         Input::MoveUpCursor => move_up_cursor_handle(uistate),
         Input::MoveDownCursor => move_down_cursor_handle(uistate),
         Input::TypeChar(key) => type_char_handle(key, state, uistate),
@@ -55,6 +58,10 @@ fn next_tick_handle(state: &mut State) {
 
 fn play_handle(state: &mut State) {
     state.play();
+}
+
+fn toggle_halt_handle(state: &mut State) {
+    state.halt = !state.halt;
 }
 
 fn move_up_cursor_handle(uistate: &mut UIState) {
