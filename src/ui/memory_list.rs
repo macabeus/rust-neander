@@ -38,22 +38,30 @@ fn format_typing_argument_line(position: &usize, typing: char) -> String {
 
 fn format_memory_line(
     uistate: &UIState,
+    state: &State,
     memory_line: &MemoryLine,
     position: &usize,
 ) -> String {
-    let is_current_line = *position == uistate.current_line;
+    let is_the_selected_line = *position == uistate.current_line;
+    let is_the_running_line = *position == state.pc;
 
-    let line = match (memory_line.kind, is_current_line, uistate.is_typing) {
+    let line = match (memory_line.kind, is_the_selected_line, uistate.is_typing) {
         (LineKind::Operator, true, true) => format_typing_operator_line(position, uistate.typing_char.unwrap()),
         (LineKind::Argument, true, true) => format_typing_argument_line(position, uistate.typing_char.unwrap()),
         (LineKind::Operator, _, _) => format_operator_line(position, &memory_line.operator, &memory_line.value),
         (LineKind::Argument, _, _) => format_argument_line(position, &memory_line.value),
     };
 
-    if is_current_line {
+    let line_with_arrow = if is_the_selected_line {
         format!(" -> {}", line)
     } else {
         format!("    {}", line)
+    };
+
+    if is_the_running_line {
+        format!("{} (PC)", line_with_arrow)
+    } else {
+        line_with_arrow
     }
 }
 
@@ -71,6 +79,7 @@ where
             Text::raw(
                 format_memory_line(
                     uistate,
+                    current_state,
                     memory_line,
                     &(i + uistate.memory_list_first_line),
                 )
