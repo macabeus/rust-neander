@@ -10,6 +10,7 @@ pub enum Input {
     MoveDownCursor,
     TypeChar(char),
     CancelType,
+    SetPC,
     Quit,
 }
 
@@ -20,6 +21,7 @@ pub fn wait_for_valid_input() -> Input {
             Key::Up => return Input::MoveUpCursor,
             Key::Down => return Input::MoveDownCursor,
             Key::Esc => return Input::CancelType,
+            Key::Char(' ') => return Input::SetPC,
             Key::Char('q') => return Input::Quit,
             Key::Char(key) => {
                 match key {
@@ -39,6 +41,7 @@ pub fn execute(input: Input, state: &mut State, uistate: &mut UIState) {
         Input::MoveDownCursor => move_down_cursor_handle(uistate),
         Input::TypeChar(key) => type_char_handle(key, state, uistate),
         Input::CancelType => cancel_type_handle(uistate),
+        Input::SetPC => set_pc_handle(state, uistate),
         Input::Quit => quit_handle(uistate),
     }
 }
@@ -88,6 +91,10 @@ fn type_char_handle(key: char, state: &mut State, uistate: &mut UIState) {
 fn cancel_type_handle(uistate: &mut UIState) {
     uistate.is_typing = false;
     uistate.typing_char = None;
+}
+
+fn set_pc_handle(state: &mut State, uistate: &mut UIState) {
+    state.pc = uistate.current_line;
 }
 
 fn quit_handle(uistate: &mut UIState) {
