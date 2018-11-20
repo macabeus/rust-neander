@@ -12,6 +12,7 @@ pub struct State {
     pub ac: u8,
     inputs: [u8; 255],
     pub halt: bool,
+    pub output: [u8; 40],
 }
 
 impl State {
@@ -22,6 +23,7 @@ impl State {
             ac: 0,
             inputs,
             halt: false,
+            output: [0x00; 40],
         }
     }
 

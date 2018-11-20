@@ -211,10 +211,15 @@ pub const OUT: Operator = Operator {
     mnemonic: OpCode::OUT,
     requires_arg: false,
     run: |state, _| {
-        print!("{}", state.ac);
+        let mut output = [0x00; 40];
+        output[0] = state.ac;
+        for (i, value) in state.output[..39].iter().enumerate() {
+            output[i + 1] = *value;
+        }
 
         State {
             pc: state.pc + 1,
+            output,
             ..*state
         }
     }
