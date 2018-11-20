@@ -54,6 +54,12 @@ impl State {
         (operator.run)(self, operator_argument)
     }
 
+    pub fn play(&mut self) {
+        while self.halt == false {
+            *self = self.next_tick();
+        }
+    }
+
     pub fn list_operators(&self) -> std::vec::Vec<MemoryLine> {
         let mut output: Vec<MemoryLine> = vec![MEMORY_LINE_BLANK; 256];
         let mut line_kind = LineKind::Operator;
