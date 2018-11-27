@@ -5,6 +5,7 @@ mod status;
 mod uistate;
 mod action;
 mod output;
+mod list_action;
 use ui::uistate::BlockLists;
 use ui::uistate::ListState;
 use ui::uistate::UIState;
@@ -46,11 +47,13 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
             current_line: 0,
             first_line: 0,
             last_line: memory_list_operators_count_line,
+            handle_action: Box::new(memory_list::MEMORY_LIST_ACTIONS),
         },
         memory_list_variables: ListState {
             current_line: 128,
             first_line: 128,
             last_line: 128 + memory_list_variables_count_line,
+            handle_action: Box::new(memory_list::MEMORY_LIST_ACTIONS),
         },
         is_typing: false,
         typing_char: None,

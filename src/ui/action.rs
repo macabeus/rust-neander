@@ -69,33 +69,11 @@ fn toggle_halt_handle(state: &mut State) {
 }
 
 fn move_up_cursor_handle(uistate: &mut UIState) {
-    let memory_list_state = uistate.mutable_current_memory_list();
-
-    if memory_list_state.current_line == 0 {
-        return;
-    }
-
-    memory_list_state.current_line -= 1;
-
-    if memory_list_state.first_line + 3 > memory_list_state.current_line && memory_list_state.first_line > 0 {
-        memory_list_state.first_line -= 1;
-        memory_list_state.last_line -= 1;
-    }
+    (uistate.current_list().handle_action.move_up_cursor_handle)(uistate.mutable_current_list());
 }
 
 fn move_down_cursor_handle(uistate: &mut UIState) {
-    let memory_list_state = uistate.mutable_current_memory_list();
-
-    if memory_list_state.current_line == 0xFF {
-        return;
-    }
-
-    memory_list_state.current_line += 1;
-
-    if memory_list_state.last_line - 3 < memory_list_state.current_line && memory_list_state.last_line < 0xFF {
-        memory_list_state.first_line += 1;
-        memory_list_state.last_line += 1;
-    }
+    (uistate.current_list().handle_action.move_down_cursor_handle)(uistate.mutable_current_list());
 }
 
 fn change_block_selected_handle(uistate: &mut UIState) {
@@ -106,14 +84,11 @@ fn change_block_selected_handle(uistate: &mut UIState) {
 }
 
 fn type_char_handle(key: char, state: &mut State, uistate: &mut UIState) {
-    let memory_list_state = match uistate.block_selected {
-        BlockLists::Operators => &uistate.memory_list_operators,
-        BlockLists::Variables => &uistate.memory_list_variables,
-    };
-
     if uistate.is_typing {
         let s = format!("{}{}", uistate.typing_char.unwrap(), key).to_string();
-        state.memory[memory_list_state.current_line] = u8::from_str_radix(&s, 16).unwrap();
+        let u8_typed = u8::from_str_radix(&s, 16).unwrap();
+        (uistate.current_list().handle_action.set_type_u8_handle)(state, uistate.current_list().current_line, u8_typed);
+
         uistate.is_typing = false;
         uistate.typing_char = None;
     } else {
@@ -128,9 +103,7 @@ fn cancel_type_handle(uistate: &mut UIState) {
 }
 
 fn set_pc_handle(state: &mut State, uistate: &mut UIState) {
-    let memory_list_state = uistate.mutable_current_memory_list();
-
-    state.pc = memory_list_state.current_line;
+    (uistate.current_list().handle_action.select_line_handle)(state, uistate.current_list().current_line);
 }
 
 fn quit_handle(uistate: &mut UIState) {

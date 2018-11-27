@@ -5,6 +5,7 @@ use state::memory_line::MemoryLine;
 use ui::uistate::BlockLists;
 use ui::uistate::ListState;
 use ui::uistate::UIState;
+use ui::list_action::ListActions;
 use ui::tui::backend::Backend;
 use ui::tui::widgets::{Widget, Block, Borders, Text, List};
 use ui::tui::layout::Rect;
@@ -58,7 +59,7 @@ fn add_selected_line_arrow(
     position: usize,
     line: String
 ) -> String {
-    if position != uistate.current_memory_list().current_line {
+    if position != uistate.current_list().current_line {
         return format!("    {}", line)
     }
 
@@ -97,7 +98,7 @@ fn format_variable(
     memory_line: &MemoryLine,
     position: usize,
 ) -> String {
-    let is_the_selected_line = position == uistate.current_memory_list().current_line;
+    let is_the_selected_line = position == uistate.current_list().current_line;
 
     match (is_the_selected_line, uistate.is_typing) {
         (true, true) => format_typing_variable_line(position, uistate.typing_char.unwrap()),
@@ -162,3 +163,40 @@ pub fn draw<B>(
       .block(Block::default().borders(Borders::ALL).title(" Memory "))
       .render(f, area);
 }
+
+// Actions
+pub const MEMORY_LIST_ACTIONS: ListActions = ListActions {
+    move_up_cursor_handle: |list_state: &mut ListState| {
+        if list_state.current_line == 0 {
+            return;
+        }
+
+        list_state.current_line -= 1;
+
+        if list_state.first_line + 3 > list_state.current_line && list_state.first_line > 0 {
+            list_state.first_line -= 1;
+            list_state.last_line -= 1;
+        }
+    },
+
+    move_down_cursor_handle: |list_state: &mut ListState| {
+        if list_state.current_line == 0xFF {
+            return;
+        }
+
+        list_state.current_line += 1;
+
+        if list_state.last_line - 3 < list_state.current_line && list_state.last_line < 0xFF {
+            list_state.first_line += 1;
+            list_state.last_line += 1;
+        }
+    },
+
+    set_type_u8_handle: |state: &mut State, line_number: usize, u8_value: u8| {
+        state.memory[line_number] = u8_value;
+    },
+
+    select_line_handle: |state: &mut State, line_number: usize| {
+        state.pc = line_number;
+    },
+};
