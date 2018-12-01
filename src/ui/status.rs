@@ -11,12 +11,37 @@ use std::fmt::UpperHex;
 
 pub const TOTAL_LINES: usize = 3;
 
-fn format_line<T>(name: &str, value: T) -> [String; 2]
+enum LinesType {
+    AC,
+    PC,
+    Halt,
+}
+
+fn map_index_to_line_type(index: usize) -> LinesType {
+    match index {
+        0 => LinesType::AC,
+        1 => LinesType::PC,
+        2 => LinesType::Halt,
+        _ => panic!("Unknown status index line"),
+    }
+}
+
+fn format_line<T>(name: &str, position: usize, uistate: &UIState, value: T) -> [String; 2]
 where
     T: UpperHex
 {
+    let is_the_selected_line = match uistate.block_selected {
+        BlockLists::Status => position == uistate.current_list().current_line,
+        _ => false,
+    };
+
     let line_name = format!("{}", name);
-    let line_value = format!("{:#04X}", value);
+    let line_value = if is_the_selected_line && uistate.is_typing {
+        format!("0x{}_", uistate.typing_char.unwrap())
+    } else {
+        format!("{:#04X}", value)
+    };
+
     [line_name, line_value]
 }
 
@@ -34,8 +59,8 @@ where
     let list_state = uistate.current_list();
 
     let lines: [[String; 2]; TOTAL_LINES] = [
-        format_line("AC  ", state.ac),
-        format_line("PC  ", state.pc),
+        format_line("AC  ", 0, uistate, state.ac),
+        format_line("PC  ", 1, uistate, state.pc),
         format_line_bool("HALT", state.halt),
     ];
 
@@ -74,8 +99,12 @@ pub const STATUS_ACTIONS: ListActions = ListActions {
         list_state.current_line = (list_state.current_line + 1) % TOTAL_LINES;
     },
 
-    set_type_u8_handle: |_state: &mut State, _line_number: usize, _u8_value: u8| {
-        // TODO
+    set_type_u8_handle: |state: &mut State, line_number: usize, u8_value: u8| {
+        match map_index_to_line_type(line_number) {
+            LinesType::AC => state.ac = u8_value,
+            LinesType::PC => state.pc = u8_value as usize,
+            LinesType::Halt => {},
+        }
     },
 
     select_line_handle: |_state: &mut State, _line_number: usize| {
