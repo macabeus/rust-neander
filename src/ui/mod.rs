@@ -43,6 +43,12 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
 
     let mut uistate = UIState {
         block_selected: BlockLists::Operators,
+        status_block: ListState {
+            current_line: 0,
+            first_line: 0,
+            last_line: status::TOTAL_LINES,
+            handle_action: Box::new(status::STATUS_ACTIONS),
+        },
         memory_list_operators: ListState {
             current_line: 0,
             first_line: 0,
@@ -66,19 +72,19 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
 
     loop {
         terminal.draw(|mut f| {
-            status::draw(&current_state, &mut f, status_chunk);
+            status::draw(&uistate, &current_state, &mut f, status_chunk);
             output::draw(&current_state, &mut f, output_chunk);
             memory_list::draw(
                 &uistate,
                 &current_state,
-                BlockLists::Operators,
+                memory_list::MemoryListKind::Operators,
                 &mut f,
                 memory_list_operators_chunk
             );
             memory_list::draw(
                 &uistate,
                 &current_state,
-                BlockLists::Variables,
+                memory_list::MemoryListKind::Variables,
                 &mut f,
                 memory_list_variables_chunk
             );

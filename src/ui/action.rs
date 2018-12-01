@@ -78,8 +78,9 @@ fn move_down_cursor_handle(uistate: &mut UIState) {
 
 fn change_block_selected_handle(uistate: &mut UIState) {
     match uistate.block_selected {
+        BlockLists::Status => uistate.block_selected = BlockLists::Operators,
         BlockLists::Operators => uistate.block_selected = BlockLists::Variables,
-        BlockLists::Variables => uistate.block_selected = BlockLists::Operators,
+        BlockLists::Variables => uistate.block_selected = BlockLists::Status,
     }
 }
 

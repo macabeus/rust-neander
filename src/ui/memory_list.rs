@@ -11,6 +11,11 @@ use ui::tui::widgets::{Widget, Block, Borders, Text, List};
 use ui::tui::layout::Rect;
 use ui::tui::Frame;
 
+pub enum MemoryListKind {
+    Operators,
+    Variables,
+}
+
 fn format_operator_line(position: usize, operator: &Operator, operator_memory: &u8) -> String {
     format!(
         "{:#04X}: {:?}  {:#04X}",
@@ -55,7 +60,7 @@ fn format_typing_variable_line(position: usize, typing: char) -> String {
 
 fn add_selected_line_arrow(
     uistate: &UIState,
-    memory_list_kind: &BlockLists,
+    memory_list_kind: &MemoryListKind,
     position: usize,
     line: String
 ) -> String {
@@ -64,8 +69,8 @@ fn add_selected_line_arrow(
     }
 
     match (&uistate.block_selected, memory_list_kind) {
-        (BlockLists::Operators, BlockLists::Operators) => format!(" -> {}", line),
-        (BlockLists::Variables, BlockLists::Variables) => format!(" -> {}", line),
+        (BlockLists::Operators, MemoryListKind::Operators) => format!(" -> {}", line),
+        (BlockLists::Variables, MemoryListKind::Variables) => format!(" -> {}", line),
         _ => format!("    {}", line),
     }
 }
@@ -76,7 +81,10 @@ fn format_memory(
     memory_line: &MemoryLine,
     position: usize,
 ) -> String {
-    let is_the_selected_line = position == uistate.current_memory_list().current_line;
+    let is_the_selected_line = match uistate.block_selected {
+        BlockLists::Operators => position == uistate.current_list().current_line,
+        _ => false,
+    };
     let is_the_running_line = position == state.pc;
 
     let line = match (memory_line.kind, is_the_selected_line, uistate.is_typing) {
@@ -98,7 +106,10 @@ fn format_variable(
     memory_line: &MemoryLine,
     position: usize,
 ) -> String {
-    let is_the_selected_line = position == uistate.current_list().current_line;
+    let is_the_selected_line = match uistate.block_selected {
+        BlockLists::Variables => position == uistate.current_list().current_line,
+        _ => false,
+    };
 
     match (is_the_selected_line, uistate.is_typing) {
         (true, true) => format_typing_variable_line(position, uistate.typing_char.unwrap()),
@@ -109,7 +120,7 @@ fn format_variable(
 pub fn draw<B>(
     uistate: &UIState,
     current_state: &State,
-    memory_list_kind: BlockLists,
+    memory_list_kind: MemoryListKind,
     f: &mut Frame<B>,
     area: Rect
 ) where B: Backend,
@@ -117,7 +128,7 @@ pub fn draw<B>(
     let memory_list_state: &ListState;
     let format: Box<Fn((usize, &MemoryLine)) -> String>;
     match memory_list_kind {
-        BlockLists::Operators => {
+        MemoryListKind::Operators => {
             memory_list_state = &uistate.memory_list_operators;
             format = Box::new(|(i, memory_line)| {
                 format_memory(
@@ -129,7 +140,7 @@ pub fn draw<B>(
             })
         },
 
-        BlockLists::Variables => {
+        MemoryListKind::Variables => {
             memory_list_state = &uistate.memory_list_variables;
             format = Box::new(|(i, memory_line)| {
                 format_variable(

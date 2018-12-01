@@ -1,6 +1,7 @@
 use ui::list_action::ListActions;
 
 pub enum BlockLists {
+    Status,
     Operators,
     Variables,
 }
@@ -14,6 +15,7 @@ pub struct ListState {
 
 pub struct UIState {
     pub block_selected: BlockLists,
+    pub status_block: ListState,
     pub memory_list_operators: ListState,
     pub memory_list_variables: ListState,
     pub is_typing: bool,
@@ -24,6 +26,7 @@ pub struct UIState {
 impl UIState {
     pub fn current_list(&self) -> &ListState {
         match self.block_selected {
+            BlockLists::Status => &self.status_block,
             BlockLists::Operators => &self.memory_list_operators,
             BlockLists::Variables => &self.memory_list_variables,
         }
@@ -31,6 +34,7 @@ impl UIState {
 
     pub fn mutable_current_list(&mut self) -> &mut ListState {
         match self.block_selected {
+            BlockLists::Status => &mut self.status_block,
             BlockLists::Operators => &mut self.memory_list_operators,
             BlockLists::Variables => &mut self.memory_list_variables,
         }
