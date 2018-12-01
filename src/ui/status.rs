@@ -107,7 +107,11 @@ pub const STATUS_ACTIONS: ListActions = ListActions {
         }
     },
 
-    select_line_handle: |_state: &mut State, _line_number: usize| {
-        // TODO
+    select_line_handle: |state: &mut State, line_number: usize| {
+        match map_index_to_line_type(line_number) {
+            LinesType::AC => state.ac = if state.ac == 0xFF { 0 } else { state.ac + 1 },
+            LinesType::PC => state.pc = if state.pc == 0xFF { 0 } else { state.pc + 1 },
+            LinesType::Halt => state.halt = !state.halt,
+        }
     },
 };
