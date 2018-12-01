@@ -36,7 +36,7 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
         .split(chunks_main_and_references[0]);
     let chunks_left_bar = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Percentage(30), Constraint::Percentage(70)].as_ref())
+        .constraints([Constraint::Length((status::TOTAL_LINES + 2) as u16), Constraint::Min(1)].as_ref())
         .split(chunks_main[0]);
     let references_chunk = chunks_main_and_references[1];
     let status_chunk = chunks_left_bar[0];
