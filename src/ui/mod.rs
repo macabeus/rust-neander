@@ -18,7 +18,7 @@ use ui::tui::layout::{Layout, Constraint, Direction};
 use ui::termion::clear;
 use ui::termion::raw::IntoRawMode;
 
-pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
+pub fn draw_screen(filepath: &str, state: State) -> Result<(), Box<std::error::Error>> {
     let stdout_raw_mode = stdout().into_raw_mode()?;
     let backend = TermionBackend::new(stdout_raw_mode);
     let mut terminal = Terminal::new(backend)?;
@@ -48,6 +48,7 @@ pub fn draw_screen(state: State) -> Result<(), Box<std::error::Error>> {
     let memory_list_variables_count_line = (memory_list_variables_chunk.height - 3) as usize;
 
     let mut uistate = UIState {
+        filepath: filepath.to_string(),
         block_selected: BlockLists::Operators,
         status_block: ListState {
             current_line: 0,

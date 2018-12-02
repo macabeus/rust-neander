@@ -14,6 +14,7 @@ pub struct ListState {
 }
 
 pub struct UIState {
+    pub filepath: String,
     pub block_selected: BlockLists,
     pub status_block: ListState,
     pub memory_list_operators: ListState,

@@ -28,6 +28,6 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     let state = State::new(memory, inputs);
 
-    ui::draw_screen(state)
+    ui::draw_screen(&cli_commands.filename, state)
 }
 

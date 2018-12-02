@@ -1,3 +1,4 @@
+use io;
 use state::State;
 use ui::uistate::BlockLists;
 use ui::uistate::UIState;
@@ -15,6 +16,7 @@ pub enum Input {
     TypeChar(char),
     CancelType,
     SetPC,
+    Save,
     Quit,
 }
 
@@ -29,6 +31,7 @@ pub fn wait_for_valid_input() -> Input {
             Key::Char('\t') => return Input::ChangeBlockSelected,
             Key::Esc => return Input::CancelType,
             Key::Char(' ') => return Input::SetPC,
+            Key::Char('s') => return Input::Save,
             Key::Char('q') => return Input::Quit,
             Key::Char(key) => {
                 match key {
@@ -52,6 +55,7 @@ pub fn execute(input: Input, state: &mut State, uistate: &mut UIState) {
         Input::TypeChar(key) => type_char_handle(key, state, uistate),
         Input::CancelType => cancel_type_handle(uistate),
         Input::SetPC => set_pc_handle(state, uistate),
+        Input::Save => save_handle(state, uistate),
         Input::Quit => quit_handle(uistate),
     }
 }
@@ -105,6 +109,10 @@ fn cancel_type_handle(uistate: &mut UIState) {
 
 fn set_pc_handle(state: &mut State, uistate: &mut UIState) {
     (uistate.current_list().handle_action.select_line_handle)(state, uistate.current_list().current_line);
+}
+
+fn save_handle(state: &mut State, uistate: &mut UIState) {
+    io::save_memory(&uistate.filepath, state.memory);
 }
 
 fn quit_handle(uistate: &mut UIState) {
