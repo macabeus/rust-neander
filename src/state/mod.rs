@@ -27,7 +27,7 @@ impl State {
         }
     }
 
-    pub fn next_tick(&self) -> State {
+    pub fn next_tick(&mut self) {
         let operator = self.fetch_operator();
 
         let operator_argument: u8;
@@ -37,26 +37,24 @@ impl State {
             operator_argument = 0;
         }
 
-        let mut new_state = self.execute_operator(operator, operator_argument);
+        self.execute_operator(operator, operator_argument);
 
-        if new_state.pc >= 255 {
-            new_state.halt = true;
+        if self.pc >= 255 {
+            self.halt = true;
         }
-
-        new_state
     }
 
     fn fetch_operator(&self) -> Operator {
         get_operator(&self.memory[self.pc])
     }
 
-    fn execute_operator(&self, operator: Operator, operator_argument: u8) -> State {
+    fn execute_operator(&mut self, operator: Operator, operator_argument: u8) {
         (operator.run)(self, operator_argument)
     }
 
     pub fn play(&mut self) {
         while self.halt == false {
-            *self = self.next_tick();
+            self.next_tick();
         }
     }
 

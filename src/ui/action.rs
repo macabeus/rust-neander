@@ -61,7 +61,7 @@ pub fn execute(input: Input, state: &mut State, uistate: &mut UIState) {
 }
 
 fn next_tick_handle(state: &mut State) {
-    *state = state.next_tick();
+    state.next_tick();
 }
 
 fn play_handle(state: &mut State) {
