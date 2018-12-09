@@ -1,5 +1,6 @@
 pub mod operator;
 pub mod memory_line;
+use io::{blank_comment, Comment, FileLine};
 use state::operator::Operator;
 use state::operator::get_operator;
 use state::memory_line::LineKind;
@@ -8,6 +9,7 @@ use state::memory_line::MEMORY_LINE_BLANK;
 
 pub struct State {
     pub memory: [u8; 255],
+    pub comments: [Comment; 255],
     pub pc: usize,
     pub ac: u8,
     inputs: [u8; 255],
@@ -16,9 +18,18 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(memory: [u8; 255], inputs: [u8; 255]) -> State {
+    pub fn new(file_lines: [FileLine; 255], inputs: [u8; 255]) -> State {
+        let lines_value_collect = file_lines.iter().map(|l| l.value).collect::<Vec<u8>>();
+        let mut memory = [0x00; 255];
+        memory.copy_from_slice(lines_value_collect.as_slice());
+
+        let lines_comment_collect = file_lines.iter().map(|l| l.comment).collect::<Vec<Comment>>();
+        let mut comments: [Comment; 255] = [blank_comment(); 255];
+        comments.copy_from_slice(lines_comment_collect.as_slice());
+
         State {
             memory,
+            comments,
             pc: 0,
             ac: 0,
             inputs,
