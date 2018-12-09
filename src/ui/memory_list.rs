@@ -130,6 +130,31 @@ fn add_comment(
     }
 }
 
+fn add_comment_typing(
+    uistate: &UIState,
+    state: &State,
+    position: usize,
+    is_the_current_block: bool,
+    line: String,
+) -> String {
+    let is_the_selected_line = position == uistate.current_list().current_line;
+
+    if
+        uistate.is_typing_comment == false ||
+        is_the_current_block == false ||
+        is_the_selected_line == false
+    {
+        return line;
+    }
+
+    let comment = state.comments[position];
+    if comment.chars().count() > 0 {
+        format!("{}_", line)
+    } else {
+        format!("{} ; _", line)
+    }
+}
+
 pub fn draw<B>(
     uistate: &UIState,
     current_state: &State,
@@ -168,6 +193,12 @@ pub fn draw<B>(
     let list_operators = current_state.list_operators();
     let list_operators_slice = &list_operators[memory_list_state.first_line..=memory_list_state.last_line];
 
+    let is_the_current_block = match (&memory_list_kind, &uistate.block_selected) {
+        (MemoryListKind::Operators, BlockLists::Operators) => true,
+        (MemoryListKind::Variables, BlockLists::Variables) => true,
+        _ => false,
+    };
+
     let memory_str_table = list_operators_slice
         .iter()
         .enumerate()
@@ -186,6 +217,16 @@ pub fn draw<B>(
              add_comment(
                  &current_state,
                  i + memory_list_state.first_line,
+                 line,
+             )
+        )
+        .enumerate()
+        .map(|(i, line)|
+             add_comment_typing(
+                 &uistate,
+                 &current_state,
+                 i + memory_list_state.first_line,
+                 is_the_current_block,
                  line,
              )
         )

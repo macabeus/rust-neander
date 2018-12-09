@@ -18,9 +18,25 @@ pub enum Input {
     SetPC,
     Save,
     Quit,
+
+    // When is typing a comment
+    StartTypeComment,
+    BackspaceComment,
+    EndTypeComment,
 }
 
-pub fn wait_for_valid_input() -> Input {
+pub fn wait_for_valid_input(uistate: &UIState) -> Input {
+    if uistate.is_typing_comment {
+        loop { for c in stdin().keys() {
+            match c.unwrap() {
+                Key::Backspace => return Input::BackspaceComment,
+                Key::Char('\n') => return Input::EndTypeComment,
+                Key::Char(c) => return Input::TypeChar(c),
+                _ => {},
+            }
+        } }
+    }
+
     loop { for c in stdin().keys() {
         match c.unwrap() {
             Key::Char('n') => return Input::NextTick,
@@ -29,6 +45,7 @@ pub fn wait_for_valid_input() -> Input {
             Key::Up => return Input::MoveUpCursor,
             Key::Down => return Input::MoveDownCursor,
             Key::Char('\t') => return Input::ChangeBlockSelected,
+            Key::Char(';') => return Input::StartTypeComment,
             Key::Esc => return Input::CancelType,
             Key::Char(' ') => return Input::SetPC,
             Key::Char('s') => return Input::Save,
@@ -57,6 +74,11 @@ pub fn execute(input: Input, state: &mut State, uistate: &mut UIState) {
         Input::SetPC => set_pc_handle(state, uistate),
         Input::Save => save_handle(state, uistate),
         Input::Quit => quit_handle(uistate),
+
+        // When is typing a comment
+        Input::StartTypeComment => start_type_comment_handle(uistate),
+        Input::BackspaceComment => backspace_comment_handle(state, uistate),
+        Input::EndTypeComment => end_type_comment_handle(uistate),
     }
 }
 
@@ -89,6 +111,11 @@ fn change_block_selected_handle(uistate: &mut UIState) {
 }
 
 fn type_char_handle(key: char, state: &mut State, uistate: &mut UIState) {
+    if uistate.is_typing_comment {
+        state.comments[uistate.current_list().current_line].push(key);
+        return
+    };
+
     if uistate.is_typing {
         let s = format!("{}{}", uistate.typing_char.unwrap(), key).to_string();
         let u8_typed = u8::from_str_radix(&s, 16).unwrap();
@@ -119,3 +146,17 @@ fn quit_handle(uistate: &mut UIState) {
     uistate.quit = true;
 }
 
+// When is typing a comment
+
+fn start_type_comment_handle(uistate: &mut UIState) {
+    uistate.is_typing_comment = true;
+}
+
+fn backspace_comment_handle(state: &mut State, uistate: &mut UIState) {
+    let line_number = uistate.current_list().current_line;
+    state.comments[line_number].pop();
+}
+
+fn end_type_comment_handle(uistate: &mut UIState) {
+    uistate.is_typing_comment = false;
+}
