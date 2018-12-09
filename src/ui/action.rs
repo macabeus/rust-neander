@@ -139,7 +139,7 @@ fn set_pc_handle(state: &mut State, uistate: &mut UIState) {
 }
 
 fn save_handle(state: &mut State, uistate: &mut UIState) {
-    io::save_memory(&uistate.filepath, state.memory);
+    io::save_file(&uistate.filepath, state.memory, state.comments);
 }
 
 fn quit_handle(uistate: &mut UIState) {

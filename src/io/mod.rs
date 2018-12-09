@@ -2,6 +2,7 @@ use std::io::BufReader;
 use std::io::BufRead;
 use std::fs::File;
 use std::io::Write;
+use std::fs::OpenOptions;
 use arrayvec::ArrayString;
 
 pub type Comment = ArrayString<[u8; 32]>;
@@ -55,20 +56,21 @@ pub fn load_inputs(string: &str) -> [u8; 255] {
     output
 }
 
-pub fn save_memory(filepath: &str, memory: [u8; 255]) {
-    let mut f = File::create(filepath).expect("Error!");
+pub fn save_file(filepath: &str, memory: [u8; 255], comments: [Comment; 255]) {
+    let mut file = OpenOptions::new()
+        .truncate(true)
+        .write(true)
+        .open(filepath)
+        .unwrap();
 
-    let mut content_placeholder: Vec<Vec<u8>> = vec![vec![]; 255];
+    let memory_and_comment = memory.iter().zip(comments.iter());
+    for (value, comment) in memory_and_comment {
+        let line = if comment.chars().count() > 0 {
+            format!("{:02X?} ; {}", value, comment)
+        } else {
+            format!("{:02X?}", value)
+        };
 
-    for (num, line) in memory.iter().enumerate() {
-        content_placeholder[num] = format!("{:02X?}\n", line).as_bytes().to_vec();
+        writeln!(file, "{}", line).unwrap();
     }
-
-    let content_flatten: Vec<u8> = content_placeholder
-        .iter()
-        .flat_map(|array| array.iter())
-        .cloned()
-        .collect();
-
-    f.write_all(content_flatten.as_slice()).expect("Error while saving!");
 }
