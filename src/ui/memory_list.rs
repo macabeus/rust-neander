@@ -117,6 +117,19 @@ fn format_variable(
     }
 }
 
+fn add_comment(
+    state: &State,
+    position: usize,
+    line: String
+) -> String {
+    let comment = state.comments[position];
+    if comment.chars().count() > 0 {
+        format!("{} ; {}", line, comment)
+    } else {
+        line
+    }
+}
+
 pub fn draw<B>(
     uistate: &UIState,
     current_state: &State,
@@ -164,6 +177,14 @@ pub fn draw<B>(
              add_selected_line_arrow(
                  &uistate,
                  &memory_list_kind,
+                 i + memory_list_state.first_line,
+                 line,
+             )
+        )
+        .enumerate()
+        .map(|(i, line)|
+             add_comment(
+                 &current_state,
                  i + memory_list_state.first_line,
                  line,
              )
