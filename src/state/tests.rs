@@ -23,3 +23,28 @@ fn nop() {
 
     compare_u8_slices(&new_state.output, &state.output);
 }
+
+#[test]
+fn sta() {
+    let mut state = State::new([0; 255], [0; 255]);
+
+    state.ac = 25;
+
+    let new_state = (operator::STA.run)(&state, 50);
+
+    assert_eq!(new_state.pc, state.pc + 2);
+
+    assert_eq!(new_state.ac, state.ac);
+
+    assert_eq!(new_state.halt, false);
+
+    for (i, item) in new_state.memory.iter().enumerate() {
+        if i == 50 {
+            assert_eq!(item, &state.ac);
+        } else {
+            assert_eq!(item, &state.memory[i]);
+        }
+    }
+
+    compare_u8_slices(&new_state.output, &state.output);
+}
