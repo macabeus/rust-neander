@@ -170,3 +170,20 @@ fn sub() {
 
     compare_u8_slices(&new_state.output, &state.output);
 }
+
+#[test]
+fn jmp() {
+    let state = State::new([0; 255], [0; 255]);
+
+    let new_state = (operator::JMP.run)(&state, 50);
+
+    assert_eq!(new_state.pc, 50);
+
+    assert_eq!(new_state.ac, state.ac);
+
+    assert_eq!(new_state.halt, false);
+
+    compare_u8_slices(&new_state.memory, &state.memory);
+
+    compare_u8_slices(&new_state.output, &state.output);
+}
