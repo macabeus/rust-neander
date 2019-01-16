@@ -263,3 +263,41 @@ fn jz_when_accumulator_is_not_zero() {
 
     compare_u8_slices(&new_state.output, &state.output);
 }
+
+#[test]
+fn jnz_when_accumulator_is_not_zero() {
+    let mut state = State::new([0; 255], [0; 255]);
+
+    state.ac = 0;
+
+    let new_state = (operator::JNZ.run)(&state, 50);
+
+    assert_eq!(new_state.pc, state.pc + 2);
+
+    assert_eq!(new_state.ac, state.ac);
+
+    assert_eq!(new_state.halt, false);
+
+    compare_u8_slices(&new_state.memory, &state.memory);
+
+    compare_u8_slices(&new_state.output, &state.output);
+}
+
+#[test]
+fn jnz_when_accumulator_is_zero() {
+    let mut state = State::new([0; 255], [0; 255]);
+
+    state.ac = 2;
+
+    let new_state = (operator::JNZ.run)(&state, 50);
+
+    assert_eq!(new_state.pc, 50);
+
+    assert_eq!(new_state.ac, state.ac);
+
+    assert_eq!(new_state.halt, false);
+
+    compare_u8_slices(&new_state.memory, &state.memory);
+
+    compare_u8_slices(&new_state.output, &state.output);
+}
