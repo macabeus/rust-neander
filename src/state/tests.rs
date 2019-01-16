@@ -318,3 +318,30 @@ fn in_operator() {
 
     compare_u8_slices(&new_state.output, &state.output);
 }
+
+#[test]
+fn out() {
+    let mut state = State::new([0; 255], [0; 255]);
+
+    state.output = [22; 40];
+
+    state.ac = 10;
+
+    let new_state = (operator::OUT.run)(&state, 0);
+
+    assert_eq!(new_state.pc, state.pc + 1);
+
+    assert_eq!(new_state.ac, state.ac);
+
+    assert_eq!(new_state.halt, false);
+
+    compare_u8_slices(&new_state.memory, &state.memory);
+
+    for (i, item) in new_state.output.iter().enumerate() {
+        if i == 0 {
+            assert_eq!(item, &state.ac);
+        } else {
+            assert_eq!(item, &state.output[i]);
+        }
+    }
+}
