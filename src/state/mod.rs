@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 pub mod operator;
 pub mod memory_line;
 use state::operator::Operator;
