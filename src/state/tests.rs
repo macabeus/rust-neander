@@ -362,3 +362,20 @@ fn ldi() {
 
     compare_u8_slices(&new_state.output, &state.output);
 }
+
+#[test]
+fn hlt() {
+    let state = State::new([0; 255], [0; 255]);
+
+    let new_state = (operator::HLT.run)(&state, 0);
+
+    assert_eq!(new_state.pc, state.pc + 1);
+
+    assert_eq!(new_state.ac, state.ac);
+
+    assert_eq!(new_state.halt, true);
+
+    compare_u8_slices(&new_state.memory, &state.memory);
+
+    compare_u8_slices(&new_state.output, &state.output);
+}
