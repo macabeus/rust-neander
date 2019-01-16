@@ -301,3 +301,20 @@ fn jnz_when_accumulator_is_zero() {
 
     compare_u8_slices(&new_state.output, &state.output);
 }
+
+#[test]
+fn in_operator() {
+    let state = State::new([0; 255], [1; 255]);
+
+    let new_state = (operator::IN.run)(&state, 0);
+
+    assert_eq!(new_state.pc, state.pc + 2);
+
+    assert_eq!(new_state.ac, 1);
+
+    assert_eq!(new_state.halt, false);
+
+    compare_u8_slices(&new_state.memory, &state.memory);
+
+    compare_u8_slices(&new_state.output, &state.output);
+}
