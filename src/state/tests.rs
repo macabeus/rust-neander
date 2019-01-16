@@ -48,3 +48,22 @@ fn sta() {
 
     compare_u8_slices(&new_state.output, &state.output);
 }
+
+#[test]
+fn lda() {
+    let mut state = State::new([0; 255], [0; 255]);
+
+    state.memory[50] = 25;
+
+    let new_state = (operator::LDA.run)(&state, 50);
+
+    assert_eq!(new_state.pc, state.pc + 2);
+
+    assert_eq!(new_state.ac, state.memory[50]);
+
+    assert_eq!(new_state.halt, false);
+
+    compare_u8_slices(&new_state.memory, &state.memory);
+
+    compare_u8_slices(&new_state.output, &state.output);
+}
