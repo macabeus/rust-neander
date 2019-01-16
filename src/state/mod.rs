@@ -33,12 +33,11 @@ impl State {
     pub fn next_tick(&self) -> State {
         let operator = self.fetch_operator();
 
-        let operator_argument: u8;
-        if operator.requires_arg {
-            operator_argument = self.memory[self.pc + 1];
+        let operator_argument: u8 = if operator.requires_arg {
+            self.memory[self.pc + 1]
         } else {
-            operator_argument = 0;
-        }
+            0
+        };
 
         let mut new_state = self.execute_operator(operator, operator_argument);
 
