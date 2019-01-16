@@ -345,3 +345,20 @@ fn out() {
         }
     }
 }
+
+#[test]
+fn ldi() {
+    let state = State::new([0; 255], [0; 255]);
+
+    let new_state = (operator::LDI.run)(&state, 50);
+
+    assert_eq!(new_state.pc, state.pc + 2);
+
+    assert_eq!(new_state.ac, 50);
+
+    assert_eq!(new_state.halt, false);
+
+    compare_u8_slices(&new_state.memory, &state.memory);
+
+    compare_u8_slices(&new_state.output, &state.output);
+}
