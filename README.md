@@ -40,7 +40,7 @@ Both assembly have few operators. Neander+ is compatible with Neander and it has
 | `A0 ... AF` | `JZ value`    | If `AC` is zero, load at `PC` the value                                |
 | `F0 ... FF` | `HLT`         | Finish the execution                                                   |
 
-If it tries to execute an nonexistent operator, such as `7A`, it will raises an error.
+If it tries to execute an nonexistent operator, such as `7A`, it will raise an error.
 
 Example to sum 2 and 3:
 
