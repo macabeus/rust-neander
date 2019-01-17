@@ -3,9 +3,9 @@
 
 **rust-neander** is a virtual machine that runs assembly Neander and Neander+!
 
-They are a very didactic hipotect machine. It is useful if you want to learn more about how CPU works and how to write a simple assembly code, because Neander and Neander+ was developed in order to be simple for beginners. You will learn these languages and hipotect machines in few minutes!
+They are very didactic hypothetical machines. It is useful if you want to learn more about how CPU works and how to write a simple assembly code, because Neander and Neander+ was developed in order to be simple for beginners. You will learn these languages and hypothetical machines in few minutes!
 
-## Neander hipotect machine
+## Neander hypothetic machine
 
 - memory size: 256
 - 8-bit to data width and addresses
@@ -14,7 +14,7 @@ They are a very didactic hipotect machine. It is useful if you want to learn mor
 - one program counter with 8-bit (`PC`)
 - one status register with 2 condition codes: negative (`N`) and zero (`Z`)
 
-### Neander+ hipotect machine
+### Neander+ hypothetic machine
 
 This machine is the same of the above plus:
 
