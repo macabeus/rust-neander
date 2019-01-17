@@ -22,7 +22,7 @@ This machine is the same of the above plus:
 
 ## Assembly
 
-Both assembly has few operators. Neander+ is compatible with Neander and it has a little more operators.
+Both assembly have few operators. Neander+ is compatible with Neander and it has a little more operators.
 
 ### Neander
 
