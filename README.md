@@ -3,7 +3,7 @@
 
 **rust-neander** is a virtual machine that runs assembly Neander and Neander+!
 
-They are a very didatic hipotect machine. It is useful if you want to learn more about how CPU works and how to write a simple assembly code, because Neander and Neander+ was developed in order to be simple for beginners. You will learn these languages and hipotect machines in few minutes!
+They are a very didactic hipotect machine. It is useful if you want to learn more about how CPU works and how to write a simple assembly code, because Neander and Neander+ was developed in order to be simple for beginners. You will learn these languages and hipotect machines in few minutes!
 
 ## Neander hipotect machine
 
