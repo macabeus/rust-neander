@@ -1,5 +1,5 @@
 # rust-neander
-> Do you want the easiest way to learning virtual machine and assembly? You found!
+> Do you want the easiest way to learning virtual machine and assembly? You've found it!
 
 **rust-neander** is a virtual machine that runs assembly Neander and Neander+!
 
