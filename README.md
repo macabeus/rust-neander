@@ -58,7 +58,7 @@ Example to sum 2 and 3:
 
 Neander+ has five more operators than Neander: `SUB`, `JNZ`, `IN`, `OUT`, `LDI`. The others operators are the same that Neander.
 
-Neander+ was was *inspirated* in [Neander-X](http://www.dcc.ufrj.br/~gabriel/neander.php)
+Neander+ was *inspirated* in [Neander-X](http://www.dcc.ufrj.br/~gabriel/neander.php)
 
 | Hex code    | Instruction   | Description                                   |
 |-------------|---------------|-----------------------------------------------|
