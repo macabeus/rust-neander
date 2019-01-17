@@ -42,7 +42,7 @@ Both assembly has few operators. Neander+ is compatible with Neander and it has 
 
 If it tries to execute an nonexistent operator, such as `7A`, it will raises an error.
 
-Example to sun 2 and 3:
+Example to sum 2 and 3:
 
 | Address | Hex code |
 | ------- | -------- |
