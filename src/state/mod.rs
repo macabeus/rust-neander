@@ -3,6 +3,7 @@ mod tests;
 
 pub mod operator;
 pub mod memory_line;
+use io::{blank_comment, Comment, FileLine};
 use state::operator::Operator;
 use state::operator::get_operator;
 use state::memory_line::LineKind;
@@ -11,6 +12,7 @@ use state::memory_line::MEMORY_LINE_BLANK;
 
 pub struct State {
     pub memory: [u8; 255],
+    pub comments: [Comment; 255],
     pub pc: usize,
     pub ac: u8,
     inputs: [u8; 255],
@@ -19,9 +21,18 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(memory: [u8; 255], inputs: [u8; 255]) -> State {
+    pub fn new(file_lines: [FileLine; 255], inputs: [u8; 255]) -> State {
+        let lines_value_collect = file_lines.iter().map(|l| l.value).collect::<Vec<u8>>();
+        let mut memory = [0x00; 255];
+        memory.copy_from_slice(lines_value_collect.as_slice());
+
+        let lines_comment_collect = file_lines.iter().map(|l| l.comment).collect::<Vec<Comment>>();
+        let mut comments: [Comment; 255] = [blank_comment(); 255];
+        comments.copy_from_slice(lines_comment_collect.as_slice());
+
         State {
             memory,
+            comments,
             pc: 0,
             ac: 0,
             inputs,
@@ -30,7 +41,7 @@ impl State {
         }
     }
 
-    pub fn next_tick(&self) -> State {
+    pub fn next_tick(&mut self) {
         let operator = self.fetch_operator();
 
         let operator_argument: u8 = if operator.requires_arg {
@@ -39,26 +50,24 @@ impl State {
             0
         };
 
-        let mut new_state = self.execute_operator(operator, operator_argument);
+        self.execute_operator(operator, operator_argument);
 
-        if new_state.pc >= 255 {
-            new_state.halt = true;
+        if self.pc >= 255 {
+            self.halt = true;
         }
-
-        new_state
     }
 
     fn fetch_operator(&self) -> Operator {
         get_operator(&self.memory[self.pc])
     }
 
-    fn execute_operator(&self, operator: Operator, operator_argument: u8) -> State {
+    fn execute_operator(&mut self, operator: Operator, operator_argument: u8) {
         (operator.run)(self, operator_argument)
     }
 
     pub fn play(&mut self) {
         while self.halt == false {
-            *self = self.next_tick();
+            self.next_tick();
         }
     }
 

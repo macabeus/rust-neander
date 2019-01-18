@@ -24,17 +24,14 @@ pub enum OpCode {
 pub struct Operator {
     pub mnemonic: OpCode,
     pub requires_arg: bool,
-    pub run: fn(&State, u8) -> State,
+    pub run: fn(&mut State, u8),
 }
 
 pub const NOP: Operator = Operator {
     mnemonic: OpCode::NOP,
     requires_arg: false,
     run: |state, _| {
-        State {
-            pc: state.pc + 1,
-            ..*state
-        }
+        state.pc += 1;
     },
 };
 
@@ -45,11 +42,8 @@ pub const STA: Operator = Operator {
         let mut memory = state.memory;
         memory[argument as usize] = state.ac;
 
-        State {
-            pc: state.pc + 2,
-            memory,
-            ..*state
-        }
+        state.pc += 2;
+        state.memory = memory;
     }
 };
 
@@ -57,11 +51,8 @@ pub const LDA: Operator = Operator {
     mnemonic: OpCode::LDA,
     requires_arg: true,
     run: |state, argument| {
-        State {
-            pc: state.pc + 2,
-            ac: state.memory[argument as usize],
-            ..*state
-        }
+        state.pc += 2;
+        state.ac = state.memory[argument as usize];
     }
 };
 
@@ -71,11 +62,8 @@ pub const ADD: Operator = Operator {
     run: |state, argument| {
         let memory_value = state.memory[argument as usize];
 
-        State {
-            pc: state.pc + 2,
-            ac: state.ac + memory_value,
-            ..*state
-        }
+        state.pc += 2;
+        state.ac += memory_value;
     }
 };
 
@@ -85,11 +73,8 @@ pub const OR: Operator = Operator {
     run: |state, argument| {
         let memory_value = state.memory[argument as usize];
 
-        State {
-            pc: state.pc + 2,
-            ac: memory_value | state.ac,
-            ..*state
-        }
+        state.pc += 2;
+        state.ac = memory_value | state.ac;
     }
 };
 
@@ -99,11 +84,8 @@ pub const AND: Operator = Operator {
     run: |state, argument| {
         let memory_value = state.memory[argument as usize];
 
-        State {
-            pc: state.pc + 2,
-            ac: memory_value & state.ac,
-            ..*state
-        }
+        state.pc += 2;
+        state.ac = memory_value & state.ac;
     }
 };
 
@@ -111,11 +93,8 @@ pub const NOT: Operator = Operator {
     mnemonic: OpCode::NOT,
     requires_arg: false,
     run: |state, _| {
-        State {
-            pc: state.pc + 1,
-            ac: !state.ac,
-            ..*state
-        }
+        state.pc += 1;
+        state.ac = !state.ac;
     }
 };
 
@@ -125,11 +104,8 @@ pub const SUB: Operator = Operator {
     run: |state, argument| {
         let memory_value = state.memory[argument as usize];
 
-        State {
-            pc: state.pc + 2,
-            ac: state.ac - memory_value,
-            ..*state
-        }
+        state.pc += 2;
+        state.ac -= memory_value;
     }
 };
 
@@ -137,10 +113,7 @@ pub const JMP: Operator = Operator {
     mnemonic: OpCode::JMP,
     requires_arg: true,
     run: |state, argument| {
-        State {
-            pc: argument as usize,
-            ..*state
-        }
+        state.pc = argument as usize;
     }
 };
 
@@ -154,10 +127,7 @@ pub const JN: Operator = Operator {
             state.pc + 2
         };
 
-        State {
-            pc: next_pc,
-            ..*state
-        }
+        state.pc = next_pc;
     }
 };
 
@@ -171,10 +141,7 @@ pub const JZ: Operator = Operator {
             state.pc + 2
         };
 
-        State {
-            pc: next_pc,
-            ..*state
-        }
+        state.pc = next_pc;
     }
 };
 
@@ -188,10 +155,7 @@ pub const JNZ: Operator = Operator {
             state.pc + 2
         };
 
-        State {
-            pc: next_pc,
-            ..*state
-        }
+        state.pc = next_pc;
     }
 };
 
@@ -199,11 +163,8 @@ pub const IN: Operator = Operator {
     mnemonic: OpCode::IN,
     requires_arg: true,
     run: |state, argument| {
-        State {
-            pc: state.pc + 2,
-            ac: state.inputs[argument as usize],
-            ..*state
-        }
+        state.pc += 2;
+        state.ac = state.inputs[argument as usize];
     }
 };
 
@@ -217,11 +178,8 @@ pub const OUT: Operator = Operator {
             output[i + 1] = *value;
         }
 
-        State {
-            pc: state.pc + 1,
-            output,
-            ..*state
-        }
+        state.pc += 1;
+        state.output = output;
     }
 };
 
@@ -229,11 +187,8 @@ pub const LDI: Operator = Operator {
     mnemonic: OpCode::LDI,
     requires_arg: true,
     run: |state, argument| {
-        State {
-            pc: state.pc + 2,
-            ac: argument,
-            ..*state
-        }
+        state.pc += 2;
+        state.ac = argument;
     }
 };
 
@@ -241,11 +196,8 @@ pub const HLT: Operator = Operator {
     mnemonic: OpCode::HLT,
     requires_arg: false,
     run: |state, _| {
-        State {
-            pc: state.pc + 1,
-            halt: true,
-            ..*state
-        }
+        state.pc += 1;
+        state.halt = true;
     },
 };
 

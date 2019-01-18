@@ -1,7 +1,7 @@
-E0
-0A
+E0 ; program start
+0A ; 10
 D0
-FF
+FF ; program end
 00
 00
 00

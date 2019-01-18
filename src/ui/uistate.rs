@@ -20,6 +20,7 @@ pub struct UIState {
     pub memory_list_operators: ListState,
     pub memory_list_variables: ListState,
     pub is_typing: bool,
+    pub is_typing_comment: bool,
     pub typing_char: Option<char>,
     pub quit: bool,
 }

@@ -69,6 +69,7 @@ pub fn draw_screen(filepath: &str, state: State) -> Result<(), Box<std::error::E
             handle_action: Box::new(memory_list::MEMORY_LIST_ACTIONS),
         },
         is_typing: false,
+        is_typing_comment: false,
         typing_char: None,
         quit: false,
     };
@@ -98,7 +99,7 @@ pub fn draw_screen(filepath: &str, state: State) -> Result<(), Box<std::error::E
             references::draw(&mut f, references_chunk);
         })?;
 
-        let input = action::wait_for_valid_input();
+        let input = action::wait_for_valid_input(&uistate);
         action::execute(input, &mut current_state, &mut uistate);
 
         if uistate.quit {
